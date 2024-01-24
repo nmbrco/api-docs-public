@@ -1,0 +1,22 @@
+component:
+    requestBody:
+        content:
+            application/json:
+                schema:
+                    type: object
+                    required:
+                        - name
+                    properties:
+                        name:
+                            type: string
+    response:
+        description: ""
+        content:
+            application/json:
+                schema:
+                    type: object
+                    required:
+                        - name
+                    properties:
+                        name:
+                            type: string
