@@ -12,13 +12,13 @@
     ],
     "tags": [
         {
+            "name": "Adjustments"
+        },
+        {
             "name": "Allowances"
         },
         {
             "name": "Allowance Line Items"
-        },
-        {
-            "name": "Allowance Templates"
         },
         {
             "name": "Allowance Types"
@@ -33,16 +33,22 @@
             "name": "Benefit Line Items"
         },
         {
-            "name": "Benefit Templates"
-        },
-        {
             "name": "Benefit Types"
         },
         {
             "name": "Business Entities"
         },
         {
-            "name": "Business Entity Deduction Line Items"
+            "name": "Business Entity Allowances"
+        },
+        {
+            "name": "Business Entity Benefits"
+        },
+        {
+            "name": "Business Entity Deductions"
+        },
+        {
+            "name": "Business Entity Reimbursements"
         },
         {
             "name": "Business Entity Verifications"
@@ -72,6 +78,9 @@
             "name": "Employees"
         },
         {
+            "name": "Employer Statutory Withholding Line Items"
+        },
+        {
             "name": "Forms"
         },
         {
@@ -85,6 +94,9 @@
         },
         {
             "name": "Line Items"
+        },
+        {
+            "name": "Overtime Rates"
         },
         {
             "name": "Partners"
@@ -114,9 +126,6 @@
             "name": "Reimbursement Line Items"
         },
         {
-            "name": "Reimbursement Templates"
-        },
-        {
             "name": "Reimbursement Types"
         },
         {
@@ -139,6 +148,46 @@
         }
     ],
     "paths": {
+        "/adjustments": {
+            "get": {
+                "summary": "List adjustments",
+                "operationId": "adjustments-index",
+                "tags": [
+                    "Adjustments"
+                ],
+                "parameters": [
+                    {
+                        "name": "correction_pay_stub_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/AdjustmentIndex"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create adjustment",
+                "operationId": "adjustments-store",
+                "tags": [
+                    "Adjustments"
+                ],
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/AdjustmentStore"
+                    }
+                },
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/AdjustmentStore"
+                }
+            }
+        },
         "/allowances": {
             "get": {
                 "summary": "List allowances",
@@ -175,14 +224,14 @@
                             "items": {
                                 "type": "string",
                                 "enum": [
-                                    "allowance_template",
+                                    "business_entity_allowance",
                                     "work_assignment",
                                     "gl_code"
                                 ]
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `allowance_template`, `work_assignment`, `gl_code`"
+                        "description": "Expandable relations: `business_entity_allowance`, `work_assignment`, `gl_code`"
                     }
                 ],
                 "responses": {
@@ -260,62 +309,6 @@
                 },
                 "requestBody": {
                     "$ref": "#/components/requestBodies/AllowanceLineItemStore"
-                }
-            }
-        },
-        "/allowance_templates": {
-            "get": {
-                "summary": "List allowance templates",
-                "operationId": "allowance-templates-index",
-                "tags": [
-                    "Allowance Templates"
-                ],
-                "parameters": [
-                    {
-                        "name": "business_entity_id",
-                        "in": "query",
-                        "schema": {
-                            "type": "string",
-                            "format": "ulid"
-                        },
-                        "required": true
-                    },
-                    {
-                        "name": "expand",
-                        "in": "query",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "enum": [
-                                    "business_entity",
-                                    "gl_code"
-                                ]
-                            }
-                        },
-                        "required": false,
-                        "description": "Expandable relations: `business_entity`, `gl_code`"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "$ref": "#/components/responses/AllowanceTemplateIndex"
-                    }
-                }
-            },
-            "post": {
-                "summary": "Create allowance template",
-                "operationId": "allowance-templates-store",
-                "tags": [
-                    "Allowance Templates"
-                ],
-                "responses": {
-                    "201": {
-                        "$ref": "#/components/responses/AllowanceTemplateStore"
-                    }
-                },
-                "requestBody": {
-                    "$ref": "#/components/requestBodies/AllowanceTemplateStore"
                 }
             }
         },
@@ -408,6 +401,20 @@
                 }
             }
         },
+        "/bank_accounts/pad": {
+            "get": {
+                "summary": "Show PAD",
+                "operationId": "bank-accounts-pad",
+                "tags": [
+                    "Bank Accounts"
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/BankAccountPad"
+                    }
+                }
+            }
+        },
         "/benefits/batch_delete": {
             "post": {
                 "summary": "Batch Delete benefit",
@@ -479,12 +486,12 @@
                                 "type": "string",
                                 "enum": [
                                     "work_assignment",
-                                    "benefit_template"
+                                    "business_entity_benefit"
                                 ]
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `work_assignment`, `benefit_template`"
+                        "description": "Expandable relations: `work_assignment`, `business_entity_benefit`"
                     }
                 ],
                 "responses": {
@@ -565,62 +572,6 @@
                 }
             }
         },
-        "/benefit_templates": {
-            "get": {
-                "summary": "List benefit templates",
-                "operationId": "benefit-templates-index",
-                "tags": [
-                    "Benefit Templates"
-                ],
-                "parameters": [
-                    {
-                        "name": "business_entity_id",
-                        "in": "query",
-                        "schema": {
-                            "type": "string",
-                            "format": "ulid"
-                        },
-                        "required": true
-                    },
-                    {
-                        "name": "expand",
-                        "in": "query",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "enum": [
-                                    "business_entity",
-                                    "gl_code"
-                                ]
-                            }
-                        },
-                        "required": false,
-                        "description": "Expandable relations: `business_entity`, `gl_code`"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "$ref": "#/components/responses/BenefitTemplateIndex"
-                    }
-                }
-            },
-            "post": {
-                "summary": "Create benefit template",
-                "operationId": "benefit-templates-store",
-                "tags": [
-                    "Benefit Templates"
-                ],
-                "responses": {
-                    "201": {
-                        "$ref": "#/components/responses/BenefitTemplateStore"
-                    }
-                },
-                "requestBody": {
-                    "$ref": "#/components/requestBodies/BenefitTemplateStore"
-                }
-            }
-        },
         "/benefit_types": {
             "get": {
                 "summary": "List benefit types",
@@ -655,14 +606,14 @@
                                     "pay_schedules",
                                     "payrolls",
                                     "bank_accounts",
-                                    "benefit_templates",
-                                    "allowance_templates",
-                                    "reimbursement_templates"
+                                    "business_entity_benefits",
+                                    "business_entity_allowances",
+                                    "business_entity_reimbursements"
                                 ]
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `company`, `pay_schedules`, `payrolls`, `bank_accounts`, `benefit_templates`, `allowance_templates`, `reimbursement_templates`"
+                        "description": "Expandable relations: `company`, `pay_schedules`, `payrolls`, `bank_accounts`, `business_entity_benefits`, `business_entity_allowances`, `business_entity_reimbursements`"
                     }
                 ],
                 "responses": {
@@ -687,16 +638,16 @@
                 }
             }
         },
-        "/business_entity_deduction_line_items": {
+        "/business_entity_allowances": {
             "get": {
-                "summary": "List business entity deduction line items",
-                "operationId": "business-entity-deduction-line-items-index",
+                "summary": "List business entity allowances",
+                "operationId": "business-entity-allowances-index",
                 "tags": [
-                    "Business Entity Deduction Line Items"
+                    "Business Entity Allowances"
                 ],
                 "parameters": [
                     {
-                        "name": "pay_stub_id",
+                        "name": "business_entity_id",
                         "in": "query",
                         "schema": {
                             "type": "string",
@@ -712,18 +663,202 @@
                             "items": {
                                 "type": "string",
                                 "enum": [
-                                    "pay_stub"
+                                    "business_entity",
+                                    "gl_code"
                                 ]
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `pay_stub`"
+                        "description": "Expandable relations: `business_entity`, `gl_code`"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/BusinessEntityDeductionLineItemIndex"
+                        "$ref": "#/components/responses/BusinessEntityAllowanceIndex"
                     }
+                }
+            },
+            "post": {
+                "summary": "Create business entity allowance",
+                "operationId": "business-entity-allowances-store",
+                "tags": [
+                    "Business Entity Allowances"
+                ],
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/BusinessEntityAllowanceStore"
+                    }
+                },
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/BusinessEntityAllowanceStore"
+                }
+            }
+        },
+        "/business_entity_benefits": {
+            "get": {
+                "summary": "List business entity benefits",
+                "operationId": "business-entity-benefits-index",
+                "tags": [
+                    "Business Entity Benefits"
+                ],
+                "parameters": [
+                    {
+                        "name": "business_entity_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "business_entity",
+                                    "gl_code"
+                                ]
+                            }
+                        },
+                        "required": false,
+                        "description": "Expandable relations: `business_entity`, `gl_code`"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/BusinessEntityBenefitIndex"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create business entity benefit",
+                "operationId": "business-entity-benefits-store",
+                "tags": [
+                    "Business Entity Benefits"
+                ],
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/BusinessEntityBenefitStore"
+                    }
+                },
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/BusinessEntityBenefitStore"
+                }
+            }
+        },
+        "/business_entity_deductions": {
+            "get": {
+                "summary": "List business entity deductions",
+                "operationId": "business-entity-deductions-index",
+                "tags": [
+                    "Business Entity Deductions"
+                ],
+                "parameters": [
+                    {
+                        "name": "business_entity_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "business_entity",
+                                    "remittance_account"
+                                ]
+                            }
+                        },
+                        "required": false,
+                        "description": "Expandable relations: `business_entity`, `remittance_account`"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/BusinessEntityDeductionIndex"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create business entity deduction",
+                "operationId": "business-entity-deductions-store",
+                "tags": [
+                    "Business Entity Deductions"
+                ],
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/BusinessEntityDeductionStore"
+                    }
+                },
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/BusinessEntityDeductionStore"
+                }
+            }
+        },
+        "/business_entity_reimbursements": {
+            "get": {
+                "summary": "List business entity reimbursements",
+                "operationId": "business-entity-reimbursements-index",
+                "tags": [
+                    "Business Entity Reimbursements"
+                ],
+                "parameters": [
+                    {
+                        "name": "business_entity_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "business_entity",
+                                    "gl_code"
+                                ]
+                            }
+                        },
+                        "required": false,
+                        "description": "Expandable relations: `business_entity`, `gl_code`"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/BusinessEntityReimbursementIndex"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create business entity reimbursement",
+                "operationId": "business-entity-reimbursements-store",
+                "tags": [
+                    "Business Entity Reimbursements"
+                ],
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/BusinessEntityReimbursementStore"
+                    }
+                },
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/BusinessEntityReimbursementStore"
                 }
             }
         },
@@ -825,12 +960,14 @@
                                 "type": "string",
                                 "enum": [
                                     "employee",
-                                    "work_assignment"
+                                    "work_assignment",
+                                    "remittance_account",
+                                    "business_entity_deduction"
                                 ]
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `employee`, `work_assignment`"
+                        "description": "Expandable relations: `employee`, `work_assignment`, `remittance_account`, `business_entity_deduction`"
                     }
                 ],
                 "responses": {
@@ -881,12 +1018,13 @@
                                 "type": "string",
                                 "enum": [
                                     "pay_stub",
-                                    "recurrence"
+                                    "recurrence",
+                                    "remittance_account"
                                 ]
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `pay_stub`, `recurrence`"
+                        "description": "Expandable relations: `pay_stub`, `recurrence`, `remittance_account`"
                     }
                 ],
                 "responses": {
@@ -951,12 +1089,13 @@
                                 "type": "string",
                                 "enum": [
                                     "pay_stub",
-                                    "recurrence"
+                                    "recurrence",
+                                    "overtime_rate"
                                 ]
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `pay_stub`, `recurrence`"
+                        "description": "Expandable relations: `pay_stub`, `recurrence`, `overtime_rate`"
                     }
                 ],
                 "responses": {
@@ -1082,6 +1221,46 @@
                 },
                 "requestBody": {
                     "$ref": "#/components/requestBodies/EmployeeStore"
+                }
+            }
+        },
+        "/employer_statutory_withholding_line_items": {
+            "get": {
+                "summary": "List employer statutory withholding line items",
+                "operationId": "employer-statutory-withholding-line-items-index",
+                "tags": [
+                    "Employer Statutory Withholding Line Items"
+                ],
+                "parameters": [
+                    {
+                        "name": "pay_stub_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "pay_stub"
+                                ]
+                            }
+                        },
+                        "required": false,
+                        "description": "Expandable relations: `pay_stub`"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/EmployerStatutoryWithholdingLineItemIndex"
+                    }
                 }
             }
         },
@@ -1218,17 +1397,6 @@
                 "tags": [
                     "Reports"
                 ],
-                "parameters": [
-                    {
-                        "name": "type",
-                        "in": "path",
-                        "schema": {
-                            "type": "string",
-                            "format": "ulid"
-                        },
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "201": {
                         "$ref": "#/components/responses/ReportStore"
@@ -1299,18 +1467,82 @@
                                 "type": "string",
                                 "enum": [
                                     "pay_stub",
-                                    "recurrence"
+                                    "recurrence",
+                                    "overtime_rate"
                                 ]
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `pay_stub`, `recurrence`"
+                        "description": "Expandable relations: `pay_stub`, `recurrence`, `overtime_rate`"
                     }
                 ],
                 "responses": {
                     "200": {
                         "$ref": "#/components/responses/LineItemIndex"
                     }
+                }
+            }
+        },
+        "/overtime_rates": {
+            "get": {
+                "summary": "List overtime rates",
+                "operationId": "overtime-rates-index",
+                "tags": [
+                    "Overtime Rates"
+                ],
+                "parameters": [
+                    {
+                        "name": "pay_rate_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "name": "include_archived",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "required": false
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "pay_rate"
+                                ]
+                            }
+                        },
+                        "required": false,
+                        "description": "Expandable relations: `pay_rate`"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/OvertimeRateIndex"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create overtime rate",
+                "operationId": "overtime-rates-store",
+                "tags": [
+                    "Overtime Rates"
+                ],
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/OvertimeRateStore"
+                    }
+                },
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/OvertimeRateStore"
                 }
             }
         },
@@ -1509,7 +1741,7 @@
                                     "work_assignment",
                                     "earning_line_items",
                                     "statutory_withholding_line_items",
-                                    "business_entity_deduction_line_items",
+                                    "employer_statutory_withholding_line_items",
                                     "allowance_line_items",
                                     "reimbursement_line_items",
                                     "benefit_line_items",
@@ -1520,7 +1752,7 @@
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `payroll`, `work_assignment`, `earning_line_items`, `statutory_withholding_line_items`, `business_entity_deduction_line_items`, `allowance_line_items`, `reimbursement_line_items`, `benefit_line_items`, `deduction_line_items`, `line_items`, `year_to_dates`"
+                        "description": "Expandable relations: `payroll`, `work_assignment`, `earning_line_items`, `statutory_withholding_line_items`, `employer_statutory_withholding_line_items`, `allowance_line_items`, `reimbursement_line_items`, `benefit_line_items`, `deduction_line_items`, `line_items`, `year_to_dates`"
                     }
                 ],
                 "responses": {
@@ -1747,13 +1979,13 @@
                             "items": {
                                 "type": "string",
                                 "enum": [
-                                    "reimbursement_template",
+                                    "business_entity_reimbursement",
                                     "work_assignment"
                                 ]
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `reimbursement_template`, `work_assignment`"
+                        "description": "Expandable relations: `business_entity_reimbursement`, `work_assignment`"
                     }
                 ],
                 "responses": {
@@ -1834,62 +2066,6 @@
                 }
             }
         },
-        "/reimbursement_templates": {
-            "get": {
-                "summary": "List reimbursement templates",
-                "operationId": "reimbursement-templates-index",
-                "tags": [
-                    "Reimbursement Templates"
-                ],
-                "parameters": [
-                    {
-                        "name": "business_entity_id",
-                        "in": "query",
-                        "schema": {
-                            "type": "string",
-                            "format": "ulid"
-                        },
-                        "required": true
-                    },
-                    {
-                        "name": "expand",
-                        "in": "query",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "enum": [
-                                    "business_entity",
-                                    "gl_code"
-                                ]
-                            }
-                        },
-                        "required": false,
-                        "description": "Expandable relations: `business_entity`, `gl_code`"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "$ref": "#/components/responses/ReimbursementTemplateIndex"
-                    }
-                }
-            },
-            "post": {
-                "summary": "Create reimbursement template",
-                "operationId": "reimbursement-templates-store",
-                "tags": [
-                    "Reimbursement Templates"
-                ],
-                "responses": {
-                    "201": {
-                        "$ref": "#/components/responses/ReimbursementTemplateStore"
-                    }
-                },
-                "requestBody": {
-                    "$ref": "#/components/requestBodies/ReimbursementTemplateStore"
-                }
-            }
-        },
         "/reimbursement_types": {
             "get": {
                 "summary": "List reimbursement types",
@@ -1920,6 +2096,19 @@
                             "format": "ulid"
                         },
                         "required": true
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "benefit",
+                                "deduction"
+                            ]
+                        },
+                        "required": false,
+                        "description": "Possible values: `benefit`, `deduction`."
                     },
                     {
                         "name": "expand",
@@ -2145,6 +2334,80 @@
                 }
             }
         },
+        "/adjustments/{adjustment}": {
+            "delete": {
+                "summary": "Delete adjustment",
+                "operationId": "adjustments-destroy",
+                "tags": [
+                    "Adjustments"
+                ],
+                "parameters": [
+                    {
+                        "name": "adjustment",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/components/responses/AdjustmentDestroy"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Retrieve adjustment",
+                "operationId": "adjustments-show",
+                "tags": [
+                    "Adjustments"
+                ],
+                "parameters": [
+                    {
+                        "name": "adjustment",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/AdjustmentShow"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update adjustment",
+                "operationId": "adjustments-update",
+                "tags": [
+                    "Adjustments"
+                ],
+                "parameters": [
+                    {
+                        "name": "adjustment",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/AdjustmentUpdate"
+                    }
+                },
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/AdjustmentUpdate"
+                }
+            }
+        },
         "/allowances/{allowance}": {
             "delete": {
                 "summary": "Delete allowance",
@@ -2193,14 +2456,14 @@
                             "items": {
                                 "type": "string",
                                 "enum": [
-                                    "allowance_template",
+                                    "business_entity_allowance",
                                     "work_assignment",
                                     "gl_code"
                                 ]
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `allowance_template`, `work_assignment`, `gl_code`"
+                        "description": "Expandable relations: `business_entity_allowance`, `work_assignment`, `gl_code`"
                     }
                 ],
                 "responses": {
@@ -2323,96 +2586,6 @@
                 },
                 "requestBody": {
                     "$ref": "#/components/requestBodies/AllowanceLineItemUpdate"
-                }
-            }
-        },
-        "/allowance_templates/{allowance_template}": {
-            "delete": {
-                "summary": "Delete allowance template",
-                "operationId": "allowance-templates-destroy",
-                "tags": [
-                    "Allowance Templates"
-                ],
-                "parameters": [
-                    {
-                        "name": "allowance_template",
-                        "in": "path",
-                        "schema": {
-                            "type": "string",
-                            "format": "ulid"
-                        },
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "$ref": "#/components/responses/AllowanceTemplateDestroy"
-                    }
-                }
-            },
-            "get": {
-                "summary": "Retrieve allowance template",
-                "operationId": "allowance-templates-show",
-                "tags": [
-                    "Allowance Templates"
-                ],
-                "parameters": [
-                    {
-                        "name": "allowance_template",
-                        "in": "path",
-                        "schema": {
-                            "type": "string",
-                            "format": "ulid"
-                        },
-                        "required": true
-                    },
-                    {
-                        "name": "expand",
-                        "in": "query",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "enum": [
-                                    "business_entity",
-                                    "gl_code"
-                                ]
-                            }
-                        },
-                        "required": false,
-                        "description": "Expandable relations: `business_entity`, `gl_code`"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "$ref": "#/components/responses/AllowanceTemplateShow"
-                    }
-                }
-            },
-            "put": {
-                "summary": "Update allowance template",
-                "operationId": "allowance-templates-update",
-                "tags": [
-                    "Allowance Templates"
-                ],
-                "parameters": [
-                    {
-                        "name": "allowance_template",
-                        "in": "path",
-                        "schema": {
-                            "type": "string",
-                            "format": "ulid"
-                        },
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "$ref": "#/components/responses/AllowanceTemplateUpdate"
-                    }
-                },
-                "requestBody": {
-                    "$ref": "#/components/requestBodies/AllowanceTemplateUpdate"
                 }
             }
         },
@@ -2556,12 +2729,12 @@
                                 "type": "string",
                                 "enum": [
                                     "work_assignment",
-                                    "benefit_template"
+                                    "business_entity_benefit"
                                 ]
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `work_assignment`, `benefit_template`"
+                        "description": "Expandable relations: `work_assignment`, `business_entity_benefit`"
                     }
                 ],
                 "responses": {
@@ -2687,96 +2860,6 @@
                 }
             }
         },
-        "/benefit_templates/{benefit_template}": {
-            "delete": {
-                "summary": "Delete benefit template",
-                "operationId": "benefit-templates-destroy",
-                "tags": [
-                    "Benefit Templates"
-                ],
-                "parameters": [
-                    {
-                        "name": "benefit_template",
-                        "in": "path",
-                        "schema": {
-                            "type": "string",
-                            "format": "ulid"
-                        },
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "$ref": "#/components/responses/BenefitTemplateDestroy"
-                    }
-                }
-            },
-            "get": {
-                "summary": "Retrieve benefit template",
-                "operationId": "benefit-templates-show",
-                "tags": [
-                    "Benefit Templates"
-                ],
-                "parameters": [
-                    {
-                        "name": "benefit_template",
-                        "in": "path",
-                        "schema": {
-                            "type": "string",
-                            "format": "ulid"
-                        },
-                        "required": true
-                    },
-                    {
-                        "name": "expand",
-                        "in": "query",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "enum": [
-                                    "business_entity",
-                                    "gl_code"
-                                ]
-                            }
-                        },
-                        "required": false,
-                        "description": "Expandable relations: `business_entity`, `gl_code`"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "$ref": "#/components/responses/BenefitTemplateShow"
-                    }
-                }
-            },
-            "put": {
-                "summary": "Update benefit template",
-                "operationId": "benefit-templates-update",
-                "tags": [
-                    "Benefit Templates"
-                ],
-                "parameters": [
-                    {
-                        "name": "benefit_template",
-                        "in": "path",
-                        "schema": {
-                            "type": "string",
-                            "format": "ulid"
-                        },
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "$ref": "#/components/responses/BenefitTemplateUpdate"
-                    }
-                },
-                "requestBody": {
-                    "$ref": "#/components/requestBodies/BenefitTemplateUpdate"
-                }
-            }
-        },
         "/business_entities/{business_entity}": {
             "delete": {
                 "summary": "Delete business entity",
@@ -2829,14 +2912,14 @@
                                     "pay_schedules",
                                     "payrolls",
                                     "bank_accounts",
-                                    "benefit_templates",
-                                    "allowance_templates",
-                                    "reimbursement_templates"
+                                    "business_entity_benefits",
+                                    "business_entity_allowances",
+                                    "business_entity_reimbursements"
                                 ]
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `company`, `pay_schedules`, `payrolls`, `bank_accounts`, `benefit_templates`, `allowance_templates`, `reimbursement_templates`"
+                        "description": "Expandable relations: `company`, `pay_schedules`, `payrolls`, `bank_accounts`, `business_entity_benefits`, `business_entity_allowances`, `business_entity_reimbursements`"
                     }
                 ],
                 "responses": {
@@ -2869,6 +2952,366 @@
                 },
                 "requestBody": {
                     "$ref": "#/components/requestBodies/BusinessEntityUpdate"
+                }
+            }
+        },
+        "/business_entity_allowances/{business_entity_allowance}": {
+            "delete": {
+                "summary": "Delete business entity allowance",
+                "operationId": "business-entity-allowances-destroy",
+                "tags": [
+                    "Business Entity Allowances"
+                ],
+                "parameters": [
+                    {
+                        "name": "business_entity_allowance",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/components/responses/BusinessEntityAllowanceDestroy"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Retrieve business entity allowance",
+                "operationId": "business-entity-allowances-show",
+                "tags": [
+                    "Business Entity Allowances"
+                ],
+                "parameters": [
+                    {
+                        "name": "business_entity_allowance",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "business_entity",
+                                    "gl_code"
+                                ]
+                            }
+                        },
+                        "required": false,
+                        "description": "Expandable relations: `business_entity`, `gl_code`"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/BusinessEntityAllowanceShow"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update business entity allowance",
+                "operationId": "business-entity-allowances-update",
+                "tags": [
+                    "Business Entity Allowances"
+                ],
+                "parameters": [
+                    {
+                        "name": "business_entity_allowance",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/BusinessEntityAllowanceUpdate"
+                    }
+                },
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/BusinessEntityAllowanceUpdate"
+                }
+            }
+        },
+        "/business_entity_benefits/{business_entity_benefit}": {
+            "delete": {
+                "summary": "Delete business entity benefit",
+                "operationId": "business-entity-benefits-destroy",
+                "tags": [
+                    "Business Entity Benefits"
+                ],
+                "parameters": [
+                    {
+                        "name": "business_entity_benefit",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/components/responses/BusinessEntityBenefitDestroy"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Retrieve business entity benefit",
+                "operationId": "business-entity-benefits-show",
+                "tags": [
+                    "Business Entity Benefits"
+                ],
+                "parameters": [
+                    {
+                        "name": "business_entity_benefit",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "business_entity",
+                                    "gl_code"
+                                ]
+                            }
+                        },
+                        "required": false,
+                        "description": "Expandable relations: `business_entity`, `gl_code`"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/BusinessEntityBenefitShow"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update business entity benefit",
+                "operationId": "business-entity-benefits-update",
+                "tags": [
+                    "Business Entity Benefits"
+                ],
+                "parameters": [
+                    {
+                        "name": "business_entity_benefit",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/BusinessEntityBenefitUpdate"
+                    }
+                },
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/BusinessEntityBenefitUpdate"
+                }
+            }
+        },
+        "/business_entity_deductions/{business_entity_deduction}": {
+            "delete": {
+                "summary": "Delete business entity deduction",
+                "operationId": "business-entity-deductions-destroy",
+                "tags": [
+                    "Business Entity Deductions"
+                ],
+                "parameters": [
+                    {
+                        "name": "business_entity_deduction",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/components/responses/BusinessEntityDeductionDestroy"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Retrieve business entity deduction",
+                "operationId": "business-entity-deductions-show",
+                "tags": [
+                    "Business Entity Deductions"
+                ],
+                "parameters": [
+                    {
+                        "name": "business_entity_deduction",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "business_entity",
+                                    "remittance_account"
+                                ]
+                            }
+                        },
+                        "required": false,
+                        "description": "Expandable relations: `business_entity`, `remittance_account`"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/BusinessEntityDeductionShow"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update business entity deduction",
+                "operationId": "business-entity-deductions-update",
+                "tags": [
+                    "Business Entity Deductions"
+                ],
+                "parameters": [
+                    {
+                        "name": "business_entity_deduction",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/BusinessEntityDeductionUpdate"
+                    }
+                },
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/BusinessEntityDeductionUpdate"
+                }
+            }
+        },
+        "/business_entity_reimbursements/{business_entity_reimbursement}": {
+            "delete": {
+                "summary": "Delete business entity reimbursement",
+                "operationId": "business-entity-reimbursements-destroy",
+                "tags": [
+                    "Business Entity Reimbursements"
+                ],
+                "parameters": [
+                    {
+                        "name": "business_entity_reimbursement",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/components/responses/BusinessEntityReimbursementDestroy"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Retrieve business entity reimbursement",
+                "operationId": "business-entity-reimbursements-show",
+                "tags": [
+                    "Business Entity Reimbursements"
+                ],
+                "parameters": [
+                    {
+                        "name": "business_entity_reimbursement",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "business_entity",
+                                    "gl_code"
+                                ]
+                            }
+                        },
+                        "required": false,
+                        "description": "Expandable relations: `business_entity`, `gl_code`"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/BusinessEntityReimbursementShow"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update business entity reimbursement",
+                "operationId": "business-entity-reimbursements-update",
+                "tags": [
+                    "Business Entity Reimbursements"
+                ],
+                "parameters": [
+                    {
+                        "name": "business_entity_reimbursement",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/BusinessEntityReimbursementUpdate"
+                    }
+                },
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/BusinessEntityReimbursementUpdate"
                 }
             }
         },
@@ -3104,12 +3547,14 @@
                                 "type": "string",
                                 "enum": [
                                     "employee",
-                                    "work_assignment"
+                                    "work_assignment",
+                                    "remittance_account",
+                                    "business_entity_deduction"
                                 ]
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `employee`, `work_assignment`"
+                        "description": "Expandable relations: `employee`, `work_assignment`, `remittance_account`, `business_entity_deduction`"
                     }
                 ],
                 "responses": {
@@ -3194,12 +3639,13 @@
                                 "type": "string",
                                 "enum": [
                                     "pay_stub",
-                                    "recurrence"
+                                    "recurrence",
+                                    "remittance_account"
                                 ]
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `pay_stub`, `recurrence`"
+                        "description": "Expandable relations: `pay_stub`, `recurrence`, `remittance_account`"
                     }
                 ],
                 "responses": {
@@ -3284,12 +3730,13 @@
                                 "type": "string",
                                 "enum": [
                                     "pay_stub",
-                                    "recurrence"
+                                    "recurrence",
+                                    "overtime_rate"
                                 ]
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `pay_stub`, `recurrence`"
+                        "description": "Expandable relations: `pay_stub`, `recurrence`, `overtime_rate`"
                     }
                 ],
                 "responses": {
@@ -3300,6 +3747,7 @@
             },
             "put": {
                 "summary": "Update earning line item",
+                "description": "Earning Line Items on non-draft Pay Stubs will not be able to update attributes.\nAny Earning Line Item with `is_managed` set to `true` will only be able to update `amount_override` and `hours`",
                 "operationId": "earning-line-items-update",
                 "tags": [
                     "Earning Line Items"
@@ -3656,6 +4104,95 @@
                 }
             }
         },
+        "/overtime_rates/{overtime_rate}": {
+            "delete": {
+                "summary": "Delete overtime rate",
+                "operationId": "overtime-rates-destroy",
+                "tags": [
+                    "Overtime Rates"
+                ],
+                "parameters": [
+                    {
+                        "name": "overtime_rate",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "$ref": "#/components/responses/OvertimeRateDestroy"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Retrieve overtime rate",
+                "operationId": "overtime-rates-show",
+                "tags": [
+                    "Overtime Rates"
+                ],
+                "parameters": [
+                    {
+                        "name": "overtime_rate",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "pay_rate"
+                                ]
+                            }
+                        },
+                        "required": false,
+                        "description": "Expandable relations: `pay_rate`"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/OvertimeRateShow"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update overtime rate",
+                "operationId": "overtime-rates-update",
+                "tags": [
+                    "Overtime Rates"
+                ],
+                "parameters": [
+                    {
+                        "name": "overtime_rate",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "ulid"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/OvertimeRateUpdate"
+                    }
+                },
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/OvertimeRateUpdate"
+                }
+            }
+        },
         "/pay_rates/{pay_rate}": {
             "delete": {
                 "summary": "Delete pay rate",
@@ -3889,7 +4426,7 @@
                                     "work_assignment",
                                     "earning_line_items",
                                     "statutory_withholding_line_items",
-                                    "business_entity_deduction_line_items",
+                                    "employer_statutory_withholding_line_items",
                                     "allowance_line_items",
                                     "reimbursement_line_items",
                                     "benefit_line_items",
@@ -3900,7 +4437,7 @@
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `payroll`, `work_assignment`, `earning_line_items`, `statutory_withholding_line_items`, `business_entity_deduction_line_items`, `allowance_line_items`, `reimbursement_line_items`, `benefit_line_items`, `deduction_line_items`, `line_items`, `year_to_dates`"
+                        "description": "Expandable relations: `payroll`, `work_assignment`, `earning_line_items`, `statutory_withholding_line_items`, `employer_statutory_withholding_line_items`, `allowance_line_items`, `reimbursement_line_items`, `benefit_line_items`, `deduction_line_items`, `line_items`, `year_to_dates`"
                     }
                 ],
                 "responses": {
@@ -4288,13 +4825,13 @@
                             "items": {
                                 "type": "string",
                                 "enum": [
-                                    "reimbursement_template",
+                                    "business_entity_reimbursement",
                                     "work_assignment"
                                 ]
                             }
                         },
                         "required": false,
-                        "description": "Expandable relations: `reimbursement_template`, `work_assignment`"
+                        "description": "Expandable relations: `business_entity_reimbursement`, `work_assignment`"
                     }
                 ],
                 "responses": {
@@ -4417,96 +4954,6 @@
                 },
                 "requestBody": {
                     "$ref": "#/components/requestBodies/ReimbursementLineItemUpdate"
-                }
-            }
-        },
-        "/reimbursement_templates/{reimbursement_template}": {
-            "delete": {
-                "summary": "Delete reimbursement template",
-                "operationId": "reimbursement-templates-destroy",
-                "tags": [
-                    "Reimbursement Templates"
-                ],
-                "parameters": [
-                    {
-                        "name": "reimbursement_template",
-                        "in": "path",
-                        "schema": {
-                            "type": "string",
-                            "format": "ulid"
-                        },
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "$ref": "#/components/responses/ReimbursementTemplateDestroy"
-                    }
-                }
-            },
-            "get": {
-                "summary": "Retrieve reimbursement template",
-                "operationId": "reimbursement-templates-show",
-                "tags": [
-                    "Reimbursement Templates"
-                ],
-                "parameters": [
-                    {
-                        "name": "reimbursement_template",
-                        "in": "path",
-                        "schema": {
-                            "type": "string",
-                            "format": "ulid"
-                        },
-                        "required": true
-                    },
-                    {
-                        "name": "expand",
-                        "in": "query",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "enum": [
-                                    "business_entity",
-                                    "gl_code"
-                                ]
-                            }
-                        },
-                        "required": false,
-                        "description": "Expandable relations: `business_entity`, `gl_code`"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "$ref": "#/components/responses/ReimbursementTemplateShow"
-                    }
-                }
-            },
-            "put": {
-                "summary": "Update reimbursement template",
-                "operationId": "reimbursement-templates-update",
-                "tags": [
-                    "Reimbursement Templates"
-                ],
-                "parameters": [
-                    {
-                        "name": "reimbursement_template",
-                        "in": "path",
-                        "schema": {
-                            "type": "string",
-                            "format": "ulid"
-                        },
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "$ref": "#/components/responses/ReimbursementTemplateUpdate"
-                    }
-                },
-                "requestBody": {
-                    "$ref": "#/components/requestBodies/ReimbursementTemplateUpdate"
                 }
             }
         },
@@ -4922,6 +5369,24 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "earning_type": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "object": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object"
+                            },
+                            "links": {
+                                "type": "object"
+                            }
+                        }
+                    },
                     "hours": {
                         "type": "number",
                         "format": "double",
@@ -4933,7 +5398,11 @@
                         "nullable": true
                     },
                     "recurrence": {},
-                    "title": {},
+                    "overtime_rate": {},
+                    "title": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "created_at": {
                         "type": "string",
                         "format": "dateTime",
@@ -4952,7 +5421,7 @@
             "YearToDate": {
                 "type": "object"
             },
-            "BusinessEntityDeductionLineItem": {
+            "EmployerStatutoryWithholdingLineItem": {
                 "type": "object",
                 "properties": {
                     "line_item_type": {
@@ -4961,7 +5430,7 @@
                     },
                     "is_managed": {
                         "type": "boolean",
-                        "description": "Always true for BusinessEntityDeductionLineItems, these items may not be created, updated or destroyed.",
+                        "description": "Always true for EmployerStatutoryWithholdingLineItems, these items may not be created, updated or destroyed.",
                         "nullable": true
                     },
                     "amount": {
@@ -4969,7 +5438,51 @@
                         "format": "double",
                         "nullable": true
                     },
+                    "amount_override": {
+                        "type": "number",
+                        "format": "double",
+                        "nullable": true
+                    },
+                    "employer_statutory_withholding_type": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "object": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object"
+                            },
+                            "links": {
+                                "type": "object"
+                            }
+                        }
+                    },
                     "title": {},
+                    "created_at": {
+                        "type": "string",
+                        "format": "dateTime",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "dateTime",
+                        "nullable": true
+                    }
+                }
+            },
+            "Adjustment": {
+                "type": "object",
+                "properties": {
+                    "expected_amount": {
+                        "type": "number",
+                        "nullable": true
+                    },
+                    "pay_stub_note": {},
+                    "admin_note": {},
                     "created_at": {
                         "type": "string",
                         "format": "dateTime",
@@ -4985,6 +5498,24 @@
             "Allowance": {
                 "type": "object",
                 "properties": {
+                    "allowance_type": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "object": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object"
+                            },
+                            "links": {
+                                "type": "object"
+                            }
+                        }
+                    },
                     "title": {},
                     "amount": {
                         "type": "number",
@@ -4994,7 +5525,12 @@
                     "frequency": {
                         "type": "string",
                         "description": "The frequency that the Allowance is added to an Employees PayStub.\nIf `per_month` is selected, the allowance is evenly distributed across all Payrolls in the month.",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "once",
+                            "per_payroll",
+                            "per_month"
+                        ]
                     },
                     "effective_from": {
                         "type": "string",
@@ -5006,7 +5542,7 @@
                         "format": "dateTime",
                         "nullable": true
                     },
-                    "allowance_template": {},
+                    "business_entity_allowance": {},
                     "created_at": {
                         "type": "string",
                         "format": "dateTime",
@@ -5041,23 +5577,25 @@
                         "format": "double",
                         "nullable": true
                     },
-                    "recurrence": {},
-                    "title": {},
-                    "created_at": {
-                        "type": "string",
-                        "format": "dateTime",
-                        "nullable": true
+                    "allowance_type": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "object": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object"
+                            },
+                            "links": {
+                                "type": "object"
+                            }
+                        }
                     },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "dateTime",
-                        "nullable": true
-                    }
-                }
-            },
-            "AllowanceTemplate": {
-                "type": "object",
-                "properties": {
+                    "recurrence": {},
                     "title": {},
                     "created_at": {
                         "type": "string",
@@ -5076,7 +5614,31 @@
                 "properties": {
                     "type": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "taxable_cash_allowance",
+                            "automobile_and_motor_vehicle",
+                            "cell_phone_allowance",
+                            "internet_allowance",
+                            "child_care_expenses",
+                            "child_eduction_taxable",
+                            "child_eduction_non_taxable",
+                            "housing_allowance_cash",
+                            "overtime_meals_non_taxable",
+                            "meals_taxable",
+                            "moving_allowance_taxable",
+                            "moving_allowance_non_taxable",
+                            "municipal_officers_expense",
+                            "parking_allowance",
+                            "social_event_allowance",
+                            "tools_allowance",
+                            "travelling_allowance_taxable",
+                            "travelling_allowance_non_taxable",
+                            "education_and_professional_development",
+                            "clothing_taxable",
+                            "clothing_non_taxable",
+                            "utilities_allowance"
+                        ]
                     },
                     "label": {
                         "type": "string",
@@ -5151,8 +5713,27 @@
             "Benefit": {
                 "type": "object",
                 "properties": {
-                    "benefit_template": {},
+                    "business_entity_benefit": {},
+                    "benefit_type": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "object": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object"
+                            },
+                            "links": {
+                                "type": "object"
+                            }
+                        }
+                    },
                     "title": {},
+                    "remittance_account_id": {},
                     "company_contribution_amount": {
                         "type": "number",
                         "format": "double",
@@ -5177,7 +5758,12 @@
                     },
                     "frequency": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "per_payroll",
+                            "per_month",
+                            "once"
+                        ]
                     },
                     "effective_from": {
                         "type": "string",
@@ -5217,6 +5803,24 @@
                         "type": "number",
                         "nullable": true
                     },
+                    "benefit_type": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "object": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object"
+                            },
+                            "links": {
+                                "type": "object"
+                            }
+                        }
+                    },
                     "company_contribution_amount": {
                         "type": "number",
                         "format": "double",
@@ -5239,22 +5843,7 @@
                     },
                     "recurrence": {},
                     "title": {},
-                    "created_at": {
-                        "type": "string",
-                        "format": "dateTime",
-                        "nullable": true
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "dateTime",
-                        "nullable": true
-                    }
-                }
-            },
-            "BenefitTemplate": {
-                "type": "object",
-                "properties": {
-                    "title": {},
+                    "remittance_account_id": {},
                     "created_at": {
                         "type": "string",
                         "format": "dateTime",
@@ -5272,7 +5861,25 @@
                 "properties": {
                     "type": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "group_term_life_insurance",
+                            "health",
+                            "dental",
+                            "critical_illness",
+                            "accident_insurance_plan",
+                            "short_term_disability",
+                            "non_group_short_term_disability",
+                            "long_term_disability",
+                            "non_group_long_term_disability",
+                            "pension_dcpp",
+                            "pension_dbpp",
+                            "pension_rrsp",
+                            "pension_restricted_rrsp",
+                            "pension_prpp",
+                            "pension_unregistered_prpp",
+                            "pension_vrsp"
+                        ]
                     },
                     "label": {
                         "type": "string",
@@ -5335,11 +5942,31 @@
                     },
                     "province_code": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "FEDERAL",
+                            "AB",
+                            "BC",
+                            "MB",
+                            "NB",
+                            "NL",
+                            "NS",
+                            "NT",
+                            "NU",
+                            "ON",
+                            "PE",
+                            "QC",
+                            "SK",
+                            "YT",
+                            "OC"
+                        ]
                     },
                     "country_code": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "CA"
+                        ]
                     },
                     "postal_code": {
                         "type": "string",
@@ -5364,15 +5991,31 @@
                     "contact_extension": {},
                     "pay_day_movement_setting": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "inherit",
+                            "previous_business_day",
+                            "next_business_day"
+                        ]
                     },
                     "remitter_type": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "quarterly",
+                            "regular",
+                            "accelerated_threshold_1",
+                            "accelerated_threshold_2"
+                        ]
                     },
                     "status": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "onboarding",
+                            "approved",
+                            "suspended"
+                        ]
                     },
                     "warnings": {
                         "type": "object",
@@ -5392,16 +6035,164 @@
                     }
                 }
             },
+            "BusinessEntityAllowance": {
+                "type": "object",
+                "properties": {
+                    "title": {},
+                    "allowance_type": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "object": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object"
+                            },
+                            "links": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "dateTime",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "dateTime",
+                        "nullable": true
+                    }
+                }
+            },
+            "BusinessEntityBenefit": {
+                "type": "object",
+                "properties": {
+                    "title": {},
+                    "benefit_type": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "object": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object"
+                            },
+                            "links": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "remittance_account_id": {},
+                    "created_at": {
+                        "type": "string",
+                        "format": "dateTime",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "dateTime",
+                        "nullable": true
+                    }
+                }
+            },
+            "BusinessEntityDeduction": {
+                "type": "object",
+                "properties": {
+                    "title": {},
+                    "deduction_type": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "object": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object"
+                            },
+                            "links": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "remittance_account": {},
+                    "created_at": {
+                        "type": "string",
+                        "format": "dateTime",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "dateTime",
+                        "nullable": true
+                    }
+                }
+            },
+            "BusinessEntityReimbursement": {
+                "type": "object",
+                "properties": {
+                    "title": {},
+                    "reimbursement_type": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "object": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object"
+                            },
+                            "links": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "dateTime",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "dateTime",
+                        "nullable": true
+                    }
+                }
+            },
             "BusinessEntityVerification": {
                 "type": "object",
                 "properties": {
                     "type": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "auto",
+                            "full"
+                        ]
                     },
                     "status": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "approved",
+                            "requested",
+                            "incomplete",
+                            "failed"
+                        ]
                     },
                     "comment": {},
                     "labels": {},
@@ -5446,7 +6237,12 @@
                     },
                     "pay_day_movement_setting": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "inherit",
+                            "previous_business_day",
+                            "next_business_day"
+                        ]
                     },
                     "external_ref": {},
                     "created_at": {
@@ -5503,6 +6299,24 @@
                 "type": "object",
                 "properties": {
                     "work_assignment": {},
+                    "deduction_type": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "object": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object"
+                            },
+                            "links": {
+                                "type": "object"
+                            }
+                        }
+                    },
                     "amount": {
                         "type": "number",
                         "format": "double",
@@ -5519,6 +6333,8 @@
                         "nullable": true
                     },
                     "title": {},
+                    "remittance_account": {},
+                    "business_entity_deduction": {},
                     "created_at": {
                         "type": "string",
                         "format": "dateTime",
@@ -5553,8 +6369,27 @@
                         "format": "double",
                         "nullable": true
                     },
+                    "deduction_type": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "object": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object"
+                            },
+                            "links": {
+                                "type": "object"
+                            }
+                        }
+                    },
                     "recurrence": {},
                     "title": {},
+                    "remittance_account": {},
                     "created_at": {
                         "type": "string",
                         "format": "dateTime",
@@ -5572,7 +6407,14 @@
                 "properties": {
                     "type": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "income_tax",
+                            "garnishment_order",
+                            "union_dues",
+                            "union_dues_post_tax",
+                            "other_deduction"
+                        ]
                     },
                     "label": {
                         "type": "string",
@@ -5616,6 +6458,24 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "earning_type": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "object": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object"
+                            },
+                            "links": {
+                                "type": "object"
+                            }
+                        }
+                    },
                     "hours": {
                         "type": "number",
                         "format": "double",
@@ -5627,7 +6487,11 @@
                         "nullable": true
                     },
                     "recurrence": {},
-                    "title": {},
+                    "overtime_rate": {},
+                    "title": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "created_at": {
                         "type": "string",
                         "format": "dateTime",
@@ -5645,11 +6509,46 @@
                 "properties": {
                     "type": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "salary",
+                            "wage",
+                            "overtime",
+                            "retroactive_pay",
+                            "retroactive_pay_increase",
+                            "commission",
+                            "in_lieu_wages",
+                            "bonus_discretionary",
+                            "bonus_non_discretionary",
+                            "vacation_pay",
+                            "gratuity",
+                            "pension",
+                            "salary_continuance",
+                            "death_benefit",
+                            "severance_pay",
+                            "retiring_allowance",
+                            "invoice_payment"
+                        ]
                     },
                     "label": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "supported_payroll_types": {
+                        "type": "object",
+                        "description": "A map of payroll types, if `false`, this earning-type is not supported on that Payroll Type.",
+                        "nullable": true,
+                        "properties": {
+                            "regular": {
+                                "type": "boolean"
+                            },
+                            "historical": {
+                                "type": "boolean"
+                            },
+                            "off_cycle": {
+                                "type": "boolean"
+                            }
+                        }
                     },
                     "created_at": {
                         "type": "string",
@@ -5698,11 +6597,31 @@
                     },
                     "province_code": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "FEDERAL",
+                            "AB",
+                            "BC",
+                            "MB",
+                            "NB",
+                            "NL",
+                            "NS",
+                            "NT",
+                            "NU",
+                            "ON",
+                            "PE",
+                            "QC",
+                            "SK",
+                            "YT",
+                            "OC"
+                        ]
                     },
                     "country_code": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "CA"
+                        ]
                     },
                     "postal_code": {
                         "type": "string",
@@ -5712,13 +6631,13 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "sin_last_3": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "date_of_birth": {
                         "type": "string",
                         "format": "dateTime",
-                        "nullable": true
-                    },
-                    "onboarding_status": {
-                        "type": "string",
                         "nullable": true
                     },
                     "warnings": {
@@ -5750,7 +6669,24 @@
                 "properties": {
                     "type": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "td1",
+                            "td1ab",
+                            "td1bc",
+                            "td1mb",
+                            "td1nb",
+                            "td1nl",
+                            "td1ns",
+                            "td1nt",
+                            "td1nu",
+                            "td1on",
+                            "td1pe",
+                            "td1sk",
+                            "td1yt",
+                            "tp_1015_3_v",
+                            "td1x"
+                        ]
                     },
                     "effective_date": {
                         "type": "string",
@@ -5800,7 +6736,24 @@
                 "properties": {
                     "type": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "td1",
+                            "td1ab",
+                            "td1bc",
+                            "td1mb",
+                            "td1nb",
+                            "td1nl",
+                            "td1ns",
+                            "td1nt",
+                            "td1nu",
+                            "td1on",
+                            "td1pe",
+                            "td1sk",
+                            "td1yt",
+                            "tp_1015_3_v",
+                            "td1x"
+                        ]
                     },
                     "label": {
                         "type": "string",
@@ -5818,27 +6771,7 @@
                         "type": "array",
                         "nullable": true,
                         "items": {
-                            "type": "object",
-                            "properties": {
-                                "key": {
-                                    "type": "string"
-                                },
-                                "label": {
-                                    "type": "string"
-                                },
-                                "type": {
-                                    "type": "string"
-                                },
-                                "required": {
-                                    "type": "boolean"
-                                },
-                                "validations": {
-                                    "type": "object"
-                                },
-                                "is_slim": {
-                                    "type": "boolean"
-                                }
-                            }
+                            "type": "object"
                         }
                     }
                 }
@@ -5852,6 +6785,55 @@
                     },
                     "code": {
                         "type": "string",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "dateTime",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "dateTime",
+                        "nullable": true
+                    }
+                }
+            },
+            "OvertimeRate": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "rate_multiplier": {
+                        "type": "number",
+                        "format": "float",
+                        "nullable": true
+                    },
+                    "hourly_rate": {
+                        "type": "number",
+                        "format": "float",
+                        "nullable": true
+                    },
+                    "hourly_rate_override": {
+                        "type": "number",
+                        "format": "float",
+                        "nullable": true
+                    },
+                    "archived_at": {
+                        "type": "string",
+                        "format": "dateTime",
+                        "nullable": true
+                    },
+                    "is_editable": {
+                        "type": "boolean",
+                        "description": "After a PayRate is on a non-draft payroll, its Type and Rate may not be updated.",
+                        "nullable": true
+                    },
+                    "is_deletable": {
+                        "type": "boolean",
+                        "description": "After a PayRate is on a non-draft payroll, it may not be deleted.",
                         "nullable": true
                     },
                     "created_at": {
@@ -5916,7 +6898,11 @@
                     },
                     "vacation_pay_method": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "manual",
+                            "per_period"
+                        ]
                     },
                     "is_editable": {
                         "type": "boolean",
@@ -5959,7 +6945,13 @@
                     },
                     "pay_frequency": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "weekly",
+                            "bi-weekly",
+                            "semi-monthly",
+                            "monthly"
+                        ]
                     },
                     "anchor_pay_date": {
                         "type": "string",
@@ -5978,7 +6970,12 @@
                     "day_2": {},
                     "pay_day_movement_setting": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "inherit",
+                            "previous_business_day",
+                            "next_business_day"
+                        ]
                     },
                     "is_editable": {
                         "type": "boolean",
@@ -6004,6 +7001,14 @@
             "PayStub": {
                 "type": "object",
                 "properties": {
+                    "payment_method": {
+                        "type": "string",
+                        "nullable": true,
+                        "enum": [
+                            "direct_deposit",
+                            "manual"
+                        ]
+                    },
                     "has_taxes_calculated": {
                         "type": "boolean",
                         "nullable": true
@@ -6018,10 +7023,12 @@
                         "properties": {
                             "gross": {},
                             "deductions": {},
+                            "subtractions": {},
                             "reimbursements": {},
                             "net": {},
                             "gross_ytd": {},
                             "deductions_ytd": {},
+                            "subtractions_ytd": {},
                             "reimbursements_ytd": {},
                             "net_ytd": {}
                         }
@@ -6058,10 +7065,6 @@
                     "cash_requirement": {
                         "type": "number",
                         "format": "float",
-                        "nullable": true
-                    },
-                    "pay_by_cheque": {
-                        "type": "boolean",
                         "nullable": true
                     },
                     "note": {
@@ -6107,11 +7110,19 @@
             "PayStubImport": {
                 "type": "object",
                 "properties": {
-                    "regular_earnings": {
+                    "wage": {
                         "type": "string",
                         "nullable": true
                     },
-                    "vacation_pay": {
+                    "salary": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "unpaid_wage_vacation_pay": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "unpaid_salary_vacation_pay": {
                         "type": "string",
                         "nullable": true
                     },
@@ -6130,6 +7141,22 @@
                     "cpp": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "cpp2": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "employer_ei": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "employer_cpp": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "employer_cpp2": {
+                        "type": "string",
+                        "nullable": true
                     }
                 }
             },
@@ -6138,7 +7165,12 @@
                 "properties": {
                     "type": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "regular",
+                            "off_cycle",
+                            "historical"
+                        ]
                     },
                     "period_number": {
                         "type": "number",
@@ -6165,6 +7197,13 @@
                     },
                     "debit_date": {
                         "type": "string",
+                        "description": "The expected date your account will be debited the `cash_requirement` amount",
+                        "nullable": true
+                    },
+                    "approval_due_at": {
+                        "type": "string",
+                        "description": "The date and time, in UTC, that this payroll must be approved by to be processed on time.",
+                        "format": "dateTime",
                         "nullable": true
                     },
                     "regular_periods_count": {
@@ -6187,6 +7226,7 @@
                         "properties": {
                             "gross": {},
                             "deductions": {},
+                            "subtractions": {},
                             "reimbursements": {},
                             "net": {}
                         }
@@ -6221,7 +7261,15 @@
                     },
                     "status": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "draft",
+                            "approved",
+                            "processing",
+                            "paid",
+                            "partially_paid",
+                            "failed"
+                        ]
                     },
                     "approved_at": {
                         "type": "string",
@@ -6252,7 +7300,17 @@
                     },
                     "pay_period_type": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "B",
+                            "M",
+                            "O",
+                            "S",
+                            "E",
+                            "H",
+                            "W",
+                            ""
+                        ]
                     },
                     "sin": {
                         "type": "string",
@@ -6298,7 +7356,12 @@
                     "employee_occupation": {},
                     "recall_code": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "U",
+                            "N",
+                            "Y"
+                        ]
                     },
                     "recall_date": {
                         "type": "string",
@@ -6311,7 +7374,39 @@
                     },
                     "separation_code": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "A00",
+                            "A01",
+                            "B00",
+                            "D00",
+                            "E00",
+                            "E02",
+                            "E03",
+                            "E04",
+                            "E05",
+                            "E06",
+                            "E09",
+                            "E10",
+                            "E11",
+                            "F00",
+                            "G00",
+                            "G07",
+                            "H00",
+                            "J00",
+                            "K00",
+                            "K12",
+                            "K13",
+                            "K14",
+                            "K15",
+                            "K16",
+                            "K17",
+                            "M00",
+                            "M08",
+                            "N00",
+                            "P00",
+                            "Z00"
+                        ]
                     },
                     "contact_first_name": {
                         "type": "string",
@@ -6330,7 +7425,16 @@
                         "nullable": true
                     },
                     "contact_phone_number_extension": {},
-                    "vacation_pay_code": {},
+                    "vacation_pay_code": {
+                        "type": "string",
+                        "nullable": true,
+                        "enum": [
+                            "1",
+                            "2",
+                            "3",
+                            "4"
+                        ]
+                    },
                     "vacation_pay_start_date": {},
                     "vacation_pay_end_date": {},
                     "vacation_pay_amount": {},
@@ -6391,6 +7495,24 @@
             "Reimbursement": {
                 "type": "object",
                 "properties": {
+                    "reimbursement_type": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "object": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object"
+                            },
+                            "links": {
+                                "type": "object"
+                            }
+                        }
+                    },
                     "amount": {
                         "type": "number",
                         "description": "Amount may be synced from the Template.",
@@ -6409,7 +7531,7 @@
                         "format": "dateTime",
                         "nullable": true
                     },
-                    "reimbursement_template": {},
+                    "business_entity_reimbursement": {},
                     "created_at": {
                         "type": "string",
                         "format": "dateTime",
@@ -6444,23 +7566,25 @@
                         "format": "double",
                         "nullable": true
                     },
-                    "recurrence": {},
-                    "title": {},
-                    "created_at": {
-                        "type": "string",
-                        "format": "dateTime",
-                        "nullable": true
+                    "reimbursement_type": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "object": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object"
+                            },
+                            "links": {
+                                "type": "object"
+                            }
+                        }
                     },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "dateTime",
-                        "nullable": true
-                    }
-                }
-            },
-            "ReimbursementTemplate": {
-                "type": "object",
-                "properties": {
+                    "recurrence": {},
                     "title": {},
                     "created_at": {
                         "type": "string",
@@ -6479,7 +7603,11 @@
                 "properties": {
                     "type": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "non_taxable_reimbursement",
+                            "taxable_reimbursement"
+                        ]
                     },
                     "label": {
                         "type": "string",
@@ -6515,7 +7643,19 @@
                 "properties": {
                     "type": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "benefit_provider",
+                            "union",
+                            "other"
+                        ]
+                    },
+                    "categories": {
+                        "type": "array",
+                        "nullable": true,
+                        "items": {
+                            "type": "string"
+                        }
                     },
                     "label": {
                         "type": "string",
@@ -6538,7 +7678,10 @@
                 "properties": {
                     "type": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "liability"
+                        ]
                     },
                     "business_entity": {},
                     "pay_schedule": {},
@@ -6575,6 +7718,10 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "is_system": {
+                        "type": "boolean",
+                        "nullable": true
+                    },
                     "is_managed": {
                         "type": "boolean",
                         "description": "Always true for StatutoryWithholdingLineItems, these items may not be created, updated or destroyed.",
@@ -6584,6 +7731,29 @@
                         "type": "number",
                         "format": "double",
                         "nullable": true
+                    },
+                    "amount_override": {
+                        "type": "number",
+                        "format": "double",
+                        "nullable": true
+                    },
+                    "statutory_withholding_type": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "object": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object"
+                            },
+                            "links": {
+                                "type": "object"
+                            }
+                        }
                     },
                     "hours": {
                         "type": "number",
@@ -6608,7 +7778,18 @@
                 "properties": {
                     "type": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "enum": [
+                            "cpp",
+                            "cpp_2",
+                            "qpp",
+                            "ei",
+                            "federal_income_tax",
+                            "provincial_income_tax",
+                            "territorial_income_tax",
+                            "employer_health_tax",
+                            "qpip"
+                        ]
                     },
                     "label": {
                         "type": "string",
@@ -6653,13 +7834,43 @@
                 "type": "object",
                 "properties": {
                     "title": {},
-                    "tax_jurisdiction": {},
+                    "tax_jurisdiction": {
+                        "type": "string",
+                        "nullable": true,
+                        "enum": [
+                            "FEDERAL",
+                            "AB",
+                            "BC",
+                            "MB",
+                            "NB",
+                            "NL",
+                            "NS",
+                            "NT",
+                            "NU",
+                            "ON",
+                            "PE",
+                            "QC",
+                            "SK",
+                            "YT",
+                            "OC"
+                        ]
+                    },
+                    "is_cpp_exempt": {
+                        "type": "boolean",
+                        "nullable": true
+                    },
+                    "is_ei_exempt": {
+                        "type": "boolean",
+                        "nullable": true
+                    },
                     "accrued_vacation_pay": {
                         "type": "number",
+                        "format": "double",
                         "nullable": true
                     },
                     "paid_vacation_pay": {
                         "type": "number",
+                        "format": "double",
                         "nullable": true
                     },
                     "archived_at": {
@@ -6681,6 +7892,69 @@
             }
         },
         "requestBodies": {
+            "AdjustmentStore": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "correction_pay_stub_id": {
+                                            "type": "string",
+                                            "format": "ulid",
+                                            "writeOnly": true
+                                        },
+                                        "source_line_item_type": {},
+                                        "source_line_item_id": {},
+                                        "expected_amount": {
+                                            "type": "number",
+                                            "writeOnly": true
+                                        },
+                                        "pay_stub_note": {},
+                                        "admin_note": {},
+                                        "is_company_amount": {
+                                            "type": "boolean",
+                                            "writeOnly": true
+                                        }
+                                    }
+                                },
+                                {
+                                    "type": "object",
+                                    "required": [
+                                        "correction_pay_stub_id",
+                                        "source_line_item_type",
+                                        "source_line_item_id",
+                                        "expected_amount"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "AdjustmentUpdate": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "correction_pay_stub_id": {
+                                    "type": "string",
+                                    "format": "ulid",
+                                    "writeOnly": true
+                                },
+                                "expected_amount": {
+                                    "type": "number",
+                                    "writeOnly": true
+                                },
+                                "pay_stub_note": {},
+                                "admin_note": {}
+                            }
+                        }
+                    }
+                }
+            },
             "AllowanceStore": {
                 "content": {
                     "application/json": {
@@ -6694,25 +7968,57 @@
                                             "format": "ulid",
                                             "writeOnly": true
                                         },
-                                        "allowance_template_id": {
+                                        "business_entity_allowance_id": {
                                             "type": "string",
                                             "format": "ulid",
                                             "writeOnly": true
                                         },
                                         "allowance_type": {
                                             "type": "string",
-                                            "description": "allowance_types",
-                                            "writeOnly": true
+                                            "description": "`taxable_cash_allowance`, `automobile_and_motor_vehicle`, `cell_phone_allowance`, `internet_allowance`, `child_care_expenses`, `child_eduction_taxable`, `child_eduction_non_taxable`, `housing_allowance_cash`, `overtime_meals_non_taxable`, `meals_taxable`, `moving_allowance_taxable`, `moving_allowance_non_taxable`, `municipal_officers_expense`, `parking_allowance`, `social_event_allowance`, `tools_allowance`, `travelling_allowance_taxable`, `travelling_allowance_non_taxable`, `education_and_professional_development`, `clothing_taxable`, `clothing_non_taxable`, `utilities_allowance`\nThe attribute must be present when `business_entity_allowance_id` is either empty or not set.",
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "taxable_cash_allowance",
+                                                "automobile_and_motor_vehicle",
+                                                "cell_phone_allowance",
+                                                "internet_allowance",
+                                                "child_care_expenses",
+                                                "child_eduction_taxable",
+                                                "child_eduction_non_taxable",
+                                                "housing_allowance_cash",
+                                                "overtime_meals_non_taxable",
+                                                "meals_taxable",
+                                                "moving_allowance_taxable",
+                                                "moving_allowance_non_taxable",
+                                                "municipal_officers_expense",
+                                                "parking_allowance",
+                                                "social_event_allowance",
+                                                "tools_allowance",
+                                                "travelling_allowance_taxable",
+                                                "travelling_allowance_non_taxable",
+                                                "education_and_professional_development",
+                                                "clothing_taxable",
+                                                "clothing_non_taxable",
+                                                "utilities_allowance"
+                                            ]
                                         },
                                         "amount": {
                                             "type": "number",
                                             "writeOnly": true
                                         },
-                                        "title": {},
+                                        "title": {
+                                            "type": "string",
+                                            "writeOnly": true
+                                        },
                                         "frequency": {
                                             "type": "string",
                                             "description": "`once`, `per_payroll`, `per_month`\nThe frequency that the Allowance is added to an Employees PayStub.\nIf `per_month` is selected, the allowance is evenly distributed across all Payrolls in the month.",
-                                            "writeOnly": true
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "once",
+                                                "per_payroll",
+                                                "per_month"
+                                            ]
                                         },
                                         "effective_from": {
                                             "type": "string",
@@ -6724,7 +8030,11 @@
                                             "format": "date",
                                             "writeOnly": true
                                         },
-                                        "gl_code": {}
+                                        "gl_code": {
+                                            "type": "string",
+                                            "description": "A valid GL Code ID or value",
+                                            "writeOnly": true
+                                        }
                                     }
                                 },
                                 {
@@ -6751,7 +8061,10 @@
                                     "type": "number",
                                     "writeOnly": true
                                 },
-                                "title": {},
+                                "title": {
+                                    "type": "string",
+                                    "writeOnly": true
+                                },
                                 "effective_from": {
                                     "type": "string",
                                     "format": "date",
@@ -6762,7 +8075,11 @@
                                     "format": "date",
                                     "writeOnly": true
                                 },
-                                "gl_code": {}
+                                "gl_code": {
+                                    "type": "string",
+                                    "description": "A valid GL Code ID or value",
+                                    "writeOnly": true
+                                }
                             }
                         }
                     }
@@ -6783,8 +8100,32 @@
                                         },
                                         "allowance_type": {
                                             "type": "string",
-                                            "description": "allowance_types",
-                                            "writeOnly": true
+                                            "description": "`taxable_cash_allowance`, `automobile_and_motor_vehicle`, `cell_phone_allowance`, `internet_allowance`, `child_care_expenses`, `child_eduction_taxable`, `child_eduction_non_taxable`, `housing_allowance_cash`, `overtime_meals_non_taxable`, `meals_taxable`, `moving_allowance_taxable`, `moving_allowance_non_taxable`, `municipal_officers_expense`, `parking_allowance`, `social_event_allowance`, `tools_allowance`, `travelling_allowance_taxable`, `travelling_allowance_non_taxable`, `education_and_professional_development`, `clothing_taxable`, `clothing_non_taxable`, `utilities_allowance`",
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "taxable_cash_allowance",
+                                                "automobile_and_motor_vehicle",
+                                                "cell_phone_allowance",
+                                                "internet_allowance",
+                                                "child_care_expenses",
+                                                "child_eduction_taxable",
+                                                "child_eduction_non_taxable",
+                                                "housing_allowance_cash",
+                                                "overtime_meals_non_taxable",
+                                                "meals_taxable",
+                                                "moving_allowance_taxable",
+                                                "moving_allowance_non_taxable",
+                                                "municipal_officers_expense",
+                                                "parking_allowance",
+                                                "social_event_allowance",
+                                                "tools_allowance",
+                                                "travelling_allowance_taxable",
+                                                "travelling_allowance_non_taxable",
+                                                "education_and_professional_development",
+                                                "clothing_taxable",
+                                                "clothing_non_taxable",
+                                                "utilities_allowance"
+                                            ]
                                         },
                                         "amount": {
                                             "type": "number",
@@ -6794,7 +8135,11 @@
                                             "type": "number",
                                             "writeOnly": true
                                         },
-                                        "gl_code": {},
+                                        "gl_code": {
+                                            "type": "string",
+                                            "description": "A valid GL Code ID or value",
+                                            "writeOnly": true
+                                        },
                                         "title": {}
                                     }
                                 },
@@ -6822,62 +8167,46 @@
                                 },
                                 "allowance_type": {
                                     "type": "string",
-                                    "description": "allowance_types",
-                                    "writeOnly": true
+                                    "description": "`taxable_cash_allowance`, `automobile_and_motor_vehicle`, `cell_phone_allowance`, `internet_allowance`, `child_care_expenses`, `child_eduction_taxable`, `child_eduction_non_taxable`, `housing_allowance_cash`, `overtime_meals_non_taxable`, `meals_taxable`, `moving_allowance_taxable`, `moving_allowance_non_taxable`, `municipal_officers_expense`, `parking_allowance`, `social_event_allowance`, `tools_allowance`, `travelling_allowance_taxable`, `travelling_allowance_non_taxable`, `education_and_professional_development`, `clothing_taxable`, `clothing_non_taxable`, `utilities_allowance`\nWriting may be blocked when entity is managed by a parent resource",
+                                    "writeOnly": true,
+                                    "enum": [
+                                        "taxable_cash_allowance",
+                                        "automobile_and_motor_vehicle",
+                                        "cell_phone_allowance",
+                                        "internet_allowance",
+                                        "child_care_expenses",
+                                        "child_eduction_taxable",
+                                        "child_eduction_non_taxable",
+                                        "housing_allowance_cash",
+                                        "overtime_meals_non_taxable",
+                                        "meals_taxable",
+                                        "moving_allowance_taxable",
+                                        "moving_allowance_non_taxable",
+                                        "municipal_officers_expense",
+                                        "parking_allowance",
+                                        "social_event_allowance",
+                                        "tools_allowance",
+                                        "travelling_allowance_taxable",
+                                        "travelling_allowance_non_taxable",
+                                        "education_and_professional_development",
+                                        "clothing_taxable",
+                                        "clothing_non_taxable",
+                                        "utilities_allowance"
+                                    ]
                                 },
                                 "amount": {
                                     "type": "number",
+                                    "description": "Writing may be blocked when entity is managed by a parent resource",
                                     "writeOnly": true
                                 },
-                                "gl_code": {},
-                                "title": {}
-                            }
-                        }
-                    }
-                }
-            },
-            "AllowanceTemplateStore": {
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "business_entity_id": {
-                                            "type": "string",
-                                            "format": "ulid",
-                                            "writeOnly": true
-                                        },
-                                        "title": {},
-                                        "allowance_type": {
-                                            "type": "string",
-                                            "description": "allowance_types",
-                                            "writeOnly": true
-                                        },
-                                        "gl_code": {}
-                                    }
+                                "gl_code": {
+                                    "type": "string",
+                                    "description": "A valid GL Code ID or value\nWriting may be blocked when entity is managed by a parent resource",
+                                    "writeOnly": true
                                 },
-                                {
-                                    "type": "object",
-                                    "required": [
-                                        "business_entity_id",
-                                        "allowance_type"
-                                    ]
+                                "title": {
+                                    "description": "Writing may be blocked when entity is managed by a parent resource"
                                 }
-                            ]
-                        }
-                    }
-                }
-            },
-            "AllowanceTemplateUpdate": {
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "title": {},
-                                "gl_code": {}
                             }
                         }
                     }
@@ -6893,16 +8222,19 @@
                                     "properties": {
                                         "employee_id": {
                                             "type": "string",
+                                            "description": "The attribute must be present when `contractor_id` and `business_entity_id` is either empty or not set.",
                                             "format": "ulid",
                                             "writeOnly": true
                                         },
                                         "contractor_id": {
                                             "type": "string",
+                                            "description": "The attribute must be present when `employee_id` and `business_entity_id` is either empty or not set.",
                                             "format": "ulid",
                                             "writeOnly": true
                                         },
                                         "business_entity_id": {
                                             "type": "string",
+                                            "description": "The attribute must be present when `employee_id` and `contractor_id` is either empty or not set.",
                                             "format": "ulid",
                                             "writeOnly": true
                                         },
@@ -6997,9 +8329,9 @@
                                     "properties": {
                                         "data": {
                                             "type": "array",
-                                            "writeOnly": true,
                                             "items": {
-                                                "type": "object"
+                                                "type": "string",
+                                                "format": "ulid"
                                             }
                                         }
                                     }
@@ -7025,9 +8357,8 @@
                                     "properties": {
                                         "data": {
                                             "type": "array",
-                                            "writeOnly": true,
                                             "items": {
-                                                "type": "object"
+                                                "$ref": "#/components/schemas/Benefit"
                                             }
                                         }
                                     }
@@ -7035,10 +8366,7 @@
                                 {
                                     "type": "object",
                                     "required": [
-                                        "data",
-                                        "data.*.work_assignment_id",
-                                        "data.*.benefit_type",
-                                        "data.*.effective_from"
+                                        "data"
                                     ]
                                 }
                             ]
@@ -7059,20 +8387,48 @@
                                             "format": "ulid",
                                             "writeOnly": true
                                         },
-                                        "benefit_template_id": {
+                                        "business_entity_benefit_id": {
+                                            "type": "string",
+                                            "format": "ulid",
+                                            "writeOnly": true
+                                        },
+                                        "remittance_account_id": {
                                             "type": "string",
                                             "format": "ulid",
                                             "writeOnly": true
                                         },
                                         "benefit_type": {
                                             "type": "string",
-                                            "description": "benefit_types",
-                                            "writeOnly": true
+                                            "description": "`group_term_life_insurance`, `health`, `dental`, `critical_illness`, `accident_insurance_plan`, `short_term_disability`, `non_group_short_term_disability`, `long_term_disability`, `non_group_long_term_disability`, `pension_dcpp`, `pension_dbpp`, `pension_rrsp`, `pension_restricted_rrsp`, `pension_prpp`, `pension_unregistered_prpp`, `pension_vrsp`\nThe attribute must be present when `business_entity_benefit_id` is either empty or not set.",
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "group_term_life_insurance",
+                                                "health",
+                                                "dental",
+                                                "critical_illness",
+                                                "accident_insurance_plan",
+                                                "short_term_disability",
+                                                "non_group_short_term_disability",
+                                                "long_term_disability",
+                                                "non_group_long_term_disability",
+                                                "pension_dcpp",
+                                                "pension_dbpp",
+                                                "pension_rrsp",
+                                                "pension_restricted_rrsp",
+                                                "pension_prpp",
+                                                "pension_unregistered_prpp",
+                                                "pension_vrsp"
+                                            ]
                                         },
                                         "frequency": {
                                             "type": "string",
-                                            "description": "`per_payroll`, `per_month`, `once_off`",
-                                            "writeOnly": true
+                                            "description": "`per_payroll`, `per_month`, `once`",
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "per_payroll",
+                                                "per_month",
+                                                "once"
+                                            ]
                                         },
                                         "company_contribution_amount": {
                                             "type": "number",
@@ -7108,7 +8464,11 @@
                                             "format": "date",
                                             "writeOnly": true
                                         },
-                                        "gl_code": {},
+                                        "gl_code": {
+                                            "type": "string",
+                                            "description": "A valid GL Code ID or value",
+                                            "writeOnly": true
+                                        },
                                         "title": {}
                                     }
                                 },
@@ -7132,7 +8492,12 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "benefit_template_id": {
+                                "business_entity_benefit_id": {
+                                    "type": "string",
+                                    "format": "ulid",
+                                    "writeOnly": true
+                                },
+                                "remittance_account_id": {
                                     "type": "string",
                                     "format": "ulid",
                                     "writeOnly": true
@@ -7163,8 +8528,13 @@
                                 },
                                 "frequency": {
                                     "type": "string",
-                                    "description": "`per_payroll`, `per_month`, `once_off`",
-                                    "writeOnly": true
+                                    "description": "`per_payroll`, `per_month`, `once`",
+                                    "writeOnly": true,
+                                    "enum": [
+                                        "per_payroll",
+                                        "per_month",
+                                        "once"
+                                    ]
                                 },
                                 "effective_from": {
                                     "type": "string",
@@ -7176,7 +8546,11 @@
                                     "format": "date",
                                     "writeOnly": true
                                 },
-                                "gl_code": {},
+                                "gl_code": {
+                                    "type": "string",
+                                    "description": "A valid GL Code ID or value",
+                                    "writeOnly": true
+                                },
                                 "title": {}
                             }
                         }
@@ -7198,8 +8572,26 @@
                                         },
                                         "benefit_type": {
                                             "type": "string",
-                                            "description": "benefit_types",
-                                            "writeOnly": true
+                                            "description": "`group_term_life_insurance`, `health`, `dental`, `critical_illness`, `accident_insurance_plan`, `short_term_disability`, `non_group_short_term_disability`, `long_term_disability`, `non_group_long_term_disability`, `pension_dcpp`, `pension_dbpp`, `pension_rrsp`, `pension_restricted_rrsp`, `pension_prpp`, `pension_unregistered_prpp`, `pension_vrsp`",
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "group_term_life_insurance",
+                                                "health",
+                                                "dental",
+                                                "critical_illness",
+                                                "accident_insurance_plan",
+                                                "short_term_disability",
+                                                "non_group_short_term_disability",
+                                                "long_term_disability",
+                                                "non_group_long_term_disability",
+                                                "pension_dcpp",
+                                                "pension_dbpp",
+                                                "pension_rrsp",
+                                                "pension_restricted_rrsp",
+                                                "pension_prpp",
+                                                "pension_unregistered_prpp",
+                                                "pension_vrsp"
+                                            ]
                                         },
                                         "company_contribution_amount": {
                                             "type": "number",
@@ -7217,8 +8609,17 @@
                                             "type": "number",
                                             "writeOnly": true
                                         },
-                                        "gl_code": {},
-                                        "title": {}
+                                        "gl_code": {
+                                            "type": "string",
+                                            "description": "A valid GL Code ID or value",
+                                            "writeOnly": true
+                                        },
+                                        "title": {},
+                                        "remittance_account_id": {
+                                            "type": "string",
+                                            "format": "ulid",
+                                            "writeOnly": true
+                                        }
                                     }
                                 },
                                 {
@@ -7241,15 +8642,35 @@
                             "properties": {
                                 "benefit_type": {
                                     "type": "string",
-                                    "description": "benefit_types",
-                                    "writeOnly": true
+                                    "description": "`group_term_life_insurance`, `health`, `dental`, `critical_illness`, `accident_insurance_plan`, `short_term_disability`, `non_group_short_term_disability`, `long_term_disability`, `non_group_long_term_disability`, `pension_dcpp`, `pension_dbpp`, `pension_rrsp`, `pension_restricted_rrsp`, `pension_prpp`, `pension_unregistered_prpp`, `pension_vrsp`\nWriting may be blocked when entity is managed by a parent resource",
+                                    "writeOnly": true,
+                                    "enum": [
+                                        "group_term_life_insurance",
+                                        "health",
+                                        "dental",
+                                        "critical_illness",
+                                        "accident_insurance_plan",
+                                        "short_term_disability",
+                                        "non_group_short_term_disability",
+                                        "long_term_disability",
+                                        "non_group_long_term_disability",
+                                        "pension_dcpp",
+                                        "pension_dbpp",
+                                        "pension_rrsp",
+                                        "pension_restricted_rrsp",
+                                        "pension_prpp",
+                                        "pension_unregistered_prpp",
+                                        "pension_vrsp"
+                                    ]
                                 },
                                 "company_contribution_amount": {
                                     "type": "number",
+                                    "description": "Writing may be blocked when entity is managed by a parent resource",
                                     "writeOnly": true
                                 },
                                 "employee_contribution_amount": {
                                     "type": "number",
+                                    "description": "Writing may be blocked when entity is managed by a parent resource",
                                     "writeOnly": true
                                 },
                                 "employee_contribution_amount_override": {
@@ -7260,55 +8681,20 @@
                                     "type": "number",
                                     "writeOnly": true
                                 },
-                                "gl_code": {},
-                                "title": {}
-                            }
-                        }
-                    }
-                }
-            },
-            "BenefitTemplateStore": {
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "business_entity_id": {
-                                            "type": "string",
-                                            "format": "ulid",
-                                            "writeOnly": true
-                                        },
-                                        "title": {},
-                                        "benefit_type": {
-                                            "type": "string",
-                                            "description": "benefit_types",
-                                            "writeOnly": true
-                                        },
-                                        "gl_code": {}
-                                    }
+                                "gl_code": {
+                                    "type": "string",
+                                    "description": "A valid GL Code ID or value\nWriting may be blocked when entity is managed by a parent resource",
+                                    "writeOnly": true
                                 },
-                                {
-                                    "type": "object",
-                                    "required": [
-                                        "business_entity_id",
-                                        "benefit_type"
-                                    ]
+                                "title": {
+                                    "description": "Writing may be blocked when entity is managed by a parent resource"
+                                },
+                                "remittance_account_id": {
+                                    "type": "string",
+                                    "description": "Writing may be blocked when entity is managed by a parent resource",
+                                    "format": "ulid",
+                                    "writeOnly": true
                                 }
-                            ]
-                        }
-                    }
-                }
-            },
-            "BenefitTemplateUpdate": {
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "title": {},
-                                "gl_code": {}
                             }
                         }
                     }
@@ -7332,7 +8718,22 @@
                                         "province_code": {
                                             "type": "string",
                                             "description": "`AB`, `BC`, `MB`, `NB`, `NL`, `NS`, `NT`, `NU`, `ON`, `PE`, `QC`, `SK`, `YT`",
-                                            "writeOnly": true
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "AB",
+                                                "BC",
+                                                "MB",
+                                                "NB",
+                                                "NL",
+                                                "NS",
+                                                "NT",
+                                                "NU",
+                                                "ON",
+                                                "PE",
+                                                "QC",
+                                                "SK",
+                                                "YT"
+                                            ]
                                         },
                                         "country_code": {
                                             "type": "string",
@@ -7369,9 +8770,8 @@
                                                 "accelerated_threshold_2"
                                             ]
                                         },
-                                        "status": {
-                                            "type": "string",
-                                            "description": "`preview`, `onboarding`",
+                                        "in_preview": {
+                                            "type": "boolean",
                                             "writeOnly": true
                                         },
                                         "external_ref": {}
@@ -7404,7 +8804,22 @@
                                 "province_code": {
                                     "type": "string",
                                     "description": "`AB`, `BC`, `MB`, `NB`, `NL`, `NS`, `NT`, `NU`, `ON`, `PE`, `QC`, `SK`, `YT`",
-                                    "writeOnly": true
+                                    "writeOnly": true,
+                                    "enum": [
+                                        "AB",
+                                        "BC",
+                                        "MB",
+                                        "NB",
+                                        "NL",
+                                        "NS",
+                                        "NT",
+                                        "NU",
+                                        "ON",
+                                        "PE",
+                                        "QC",
+                                        "SK",
+                                        "YT"
+                                    ]
                                 },
                                 "country_code": {
                                     "type": "string",
@@ -7441,8 +8856,300 @@
                                         "accelerated_threshold_2"
                                     ]
                                 },
-                                "status": {},
+                                "in_preview": {
+                                    "type": "boolean",
+                                    "writeOnly": true
+                                },
                                 "external_ref": {}
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityAllowanceStore": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "business_entity_id": {
+                                            "type": "string",
+                                            "format": "ulid",
+                                            "writeOnly": true
+                                        },
+                                        "title": {},
+                                        "allowance_type": {
+                                            "type": "string",
+                                            "description": "`taxable_cash_allowance`, `automobile_and_motor_vehicle`, `cell_phone_allowance`, `internet_allowance`, `child_care_expenses`, `child_eduction_taxable`, `child_eduction_non_taxable`, `housing_allowance_cash`, `overtime_meals_non_taxable`, `meals_taxable`, `moving_allowance_taxable`, `moving_allowance_non_taxable`, `municipal_officers_expense`, `parking_allowance`, `social_event_allowance`, `tools_allowance`, `travelling_allowance_taxable`, `travelling_allowance_non_taxable`, `education_and_professional_development`, `clothing_taxable`, `clothing_non_taxable`, `utilities_allowance`",
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "taxable_cash_allowance",
+                                                "automobile_and_motor_vehicle",
+                                                "cell_phone_allowance",
+                                                "internet_allowance",
+                                                "child_care_expenses",
+                                                "child_eduction_taxable",
+                                                "child_eduction_non_taxable",
+                                                "housing_allowance_cash",
+                                                "overtime_meals_non_taxable",
+                                                "meals_taxable",
+                                                "moving_allowance_taxable",
+                                                "moving_allowance_non_taxable",
+                                                "municipal_officers_expense",
+                                                "parking_allowance",
+                                                "social_event_allowance",
+                                                "tools_allowance",
+                                                "travelling_allowance_taxable",
+                                                "travelling_allowance_non_taxable",
+                                                "education_and_professional_development",
+                                                "clothing_taxable",
+                                                "clothing_non_taxable",
+                                                "utilities_allowance"
+                                            ]
+                                        },
+                                        "gl_code": {
+                                            "type": "string",
+                                            "description": "A valid GL Code ID or value",
+                                            "writeOnly": true
+                                        }
+                                    }
+                                },
+                                {
+                                    "type": "object",
+                                    "required": [
+                                        "business_entity_id",
+                                        "allowance_type"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "BusinessEntityAllowanceUpdate": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "title": {},
+                                "gl_code": {
+                                    "type": "string",
+                                    "description": "A valid GL Code ID or value",
+                                    "writeOnly": true
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityBenefitStore": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "business_entity_id": {
+                                            "type": "string",
+                                            "format": "ulid",
+                                            "writeOnly": true
+                                        },
+                                        "title": {},
+                                        "benefit_type": {
+                                            "type": "string",
+                                            "description": "`group_term_life_insurance`, `health`, `dental`, `critical_illness`, `accident_insurance_plan`, `short_term_disability`, `non_group_short_term_disability`, `long_term_disability`, `non_group_long_term_disability`, `pension_dcpp`, `pension_dbpp`, `pension_rrsp`, `pension_restricted_rrsp`, `pension_prpp`, `pension_unregistered_prpp`, `pension_vrsp`",
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "group_term_life_insurance",
+                                                "health",
+                                                "dental",
+                                                "critical_illness",
+                                                "accident_insurance_plan",
+                                                "short_term_disability",
+                                                "non_group_short_term_disability",
+                                                "long_term_disability",
+                                                "non_group_long_term_disability",
+                                                "pension_dcpp",
+                                                "pension_dbpp",
+                                                "pension_rrsp",
+                                                "pension_restricted_rrsp",
+                                                "pension_prpp",
+                                                "pension_unregistered_prpp",
+                                                "pension_vrsp"
+                                            ]
+                                        },
+                                        "remittance_account_id": {
+                                            "type": "string",
+                                            "format": "ulid",
+                                            "writeOnly": true
+                                        },
+                                        "gl_code": {
+                                            "type": "string",
+                                            "description": "A valid GL Code ID or value",
+                                            "writeOnly": true
+                                        }
+                                    }
+                                },
+                                {
+                                    "type": "object",
+                                    "required": [
+                                        "business_entity_id",
+                                        "benefit_type"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "BusinessEntityBenefitUpdate": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "title": {},
+                                "remittance_account_id": {
+                                    "type": "string",
+                                    "format": "ulid",
+                                    "writeOnly": true
+                                },
+                                "gl_code": {
+                                    "type": "string",
+                                    "description": "A valid GL Code ID or value",
+                                    "writeOnly": true
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityDeductionStore": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "business_entity_id": {
+                                            "type": "string",
+                                            "format": "ulid",
+                                            "writeOnly": true
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "writeOnly": true
+                                        },
+                                        "deduction_type": {
+                                            "type": "string",
+                                            "description": "`income_tax`, `garnishment_order`, `union_dues`, `union_dues_post_tax`, `other_deduction`",
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "income_tax",
+                                                "garnishment_order",
+                                                "union_dues",
+                                                "union_dues_post_tax",
+                                                "other_deduction"
+                                            ]
+                                        },
+                                        "remittance_account_id": {
+                                            "type": "string",
+                                            "format": "ulid",
+                                            "writeOnly": true
+                                        }
+                                    }
+                                },
+                                {
+                                    "type": "object",
+                                    "required": [
+                                        "business_entity_id",
+                                        "deduction_type"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "BusinessEntityDeductionUpdate": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "title": {
+                                    "type": "string",
+                                    "writeOnly": true
+                                },
+                                "remittance_account_id": {
+                                    "type": "string",
+                                    "format": "ulid",
+                                    "writeOnly": true
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityReimbursementStore": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "business_entity_id": {
+                                            "type": "string",
+                                            "format": "ulid",
+                                            "writeOnly": true
+                                        },
+                                        "title": {},
+                                        "reimbursement_type": {
+                                            "type": "string",
+                                            "description": "`non_taxable_reimbursement`, `taxable_reimbursement`",
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "non_taxable_reimbursement",
+                                                "taxable_reimbursement"
+                                            ]
+                                        },
+                                        "gl_code": {
+                                            "type": "string",
+                                            "description": "A valid GL Code ID or value",
+                                            "writeOnly": true
+                                        }
+                                    }
+                                },
+                                {
+                                    "type": "object",
+                                    "required": [
+                                        "business_entity_id",
+                                        "reimbursement_type"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "BusinessEntityReimbursementUpdate": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "title": {},
+                                "gl_code": {
+                                    "type": "string",
+                                    "description": "A valid GL Code ID or value",
+                                    "writeOnly": true
+                                }
                             }
                         }
                     }
@@ -7565,7 +9272,17 @@
                                             "format": "ulid",
                                             "writeOnly": true
                                         },
+                                        "business_entity_deduction_id": {
+                                            "type": "string",
+                                            "format": "ulid",
+                                            "writeOnly": true
+                                        },
                                         "work_assignment_id": {
+                                            "type": "string",
+                                            "format": "ulid",
+                                            "writeOnly": true
+                                        },
+                                        "remittance_account_id": {
                                             "type": "string",
                                             "format": "ulid",
                                             "writeOnly": true
@@ -7573,18 +9290,34 @@
                                         "scope": {
                                             "type": "string",
                                             "description": "`all_work_assignments`, `single_work_assignment`",
-                                            "writeOnly": true
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "all_work_assignments",
+                                                "single_work_assignment"
+                                            ]
                                         },
                                         "deduction_type": {
                                             "type": "string",
-                                            "description": "deduction_types",
-                                            "writeOnly": true
+                                            "description": "`income_tax`, `garnishment_order`, `union_dues`, `union_dues_post_tax`, `other_deduction`",
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "income_tax",
+                                                "garnishment_order",
+                                                "union_dues",
+                                                "union_dues_post_tax",
+                                                "other_deduction"
+                                            ]
                                         },
                                         "title": {},
                                         "frequency": {
                                             "type": "string",
                                             "description": "`once`, `per_payroll`, `per_month`",
-                                            "writeOnly": true
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "once",
+                                                "per_payroll",
+                                                "per_month"
+                                            ]
                                         },
                                         "amount": {
                                             "type": "number",
@@ -7593,7 +9326,12 @@
                                         "amount_type": {
                                             "type": "string",
                                             "description": "`fixed`, `percent`, `fixed_per_hour`",
-                                            "writeOnly": true
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "fixed",
+                                                "percent",
+                                                "fixed_per_hour"
+                                            ]
                                         },
                                         "effective_from": {
                                             "type": "string",
@@ -7632,7 +9370,11 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "title": {},
+                                "remittance_account_id": {
+                                    "type": "string",
+                                    "format": "ulid",
+                                    "writeOnly": true
+                                },
                                 "amount": {
                                     "type": "number",
                                     "writeOnly": true
@@ -7646,7 +9388,8 @@
                                     "type": "string",
                                     "format": "date",
                                     "writeOnly": true
-                                }
+                                },
+                                "title": {}
                             }
                         }
                     }
@@ -7667,8 +9410,15 @@
                                         },
                                         "deduction_type": {
                                             "type": "string",
-                                            "description": "deduction_types",
-                                            "writeOnly": true
+                                            "description": "`income_tax`, `garnishment_order`, `union_dues`, `union_dues_post_tax`, `other_deduction`",
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "income_tax",
+                                                "garnishment_order",
+                                                "union_dues",
+                                                "union_dues_post_tax",
+                                                "other_deduction"
+                                            ]
                                         },
                                         "amount": {
                                             "type": "number",
@@ -7678,7 +9428,12 @@
                                             "type": "number",
                                             "writeOnly": true
                                         },
-                                        "title": {}
+                                        "title": {},
+                                        "remittance_account_id": {
+                                            "type": "string",
+                                            "format": "ulid",
+                                            "writeOnly": true
+                                        }
                                     }
                                 },
                                 {
@@ -7705,14 +9460,30 @@
                                 },
                                 "deduction_type": {
                                     "type": "string",
-                                    "description": "deduction_types",
-                                    "writeOnly": true
+                                    "description": "`income_tax`, `garnishment_order`, `union_dues`, `union_dues_post_tax`, `other_deduction`\nWriting may be blocked when entity is managed by a parent resource",
+                                    "writeOnly": true,
+                                    "enum": [
+                                        "income_tax",
+                                        "garnishment_order",
+                                        "union_dues",
+                                        "union_dues_post_tax",
+                                        "other_deduction"
+                                    ]
                                 },
                                 "amount": {
                                     "type": "number",
+                                    "description": "Writing may be blocked when entity is managed by a parent resource",
                                     "writeOnly": true
                                 },
-                                "title": {}
+                                "title": {
+                                    "description": "Writing may be blocked when entity is managed by a parent resource"
+                                },
+                                "remittance_account_id": {
+                                    "type": "string",
+                                    "description": "Writing may be blocked when entity is managed by a parent resource",
+                                    "format": "ulid",
+                                    "writeOnly": true
+                                }
                             }
                         }
                     }
@@ -7733,7 +9504,36 @@
                                         },
                                         "earning_type": {
                                             "type": "string",
-                                            "description": "earning_types",
+                                            "description": "`salary`, `wage`, `overtime`, `retroactive_pay`, `retroactive_pay_increase`, `commission`, `in_lieu_wages`, `bonus_discretionary`, `bonus_non_discretionary`, `vacation_pay`, `gratuity`, `pension`, `salary_continuance`, `death_benefit`, `severance_pay`, `retiring_allowance`, `invoice_payment`",
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "salary",
+                                                "wage",
+                                                "overtime",
+                                                "retroactive_pay",
+                                                "retroactive_pay_increase",
+                                                "commission",
+                                                "in_lieu_wages",
+                                                "bonus_discretionary",
+                                                "bonus_non_discretionary",
+                                                "vacation_pay",
+                                                "gratuity",
+                                                "pension",
+                                                "salary_continuance",
+                                                "death_benefit",
+                                                "severance_pay",
+                                                "retiring_allowance",
+                                                "invoice_payment"
+                                            ]
+                                        },
+                                        "pay_rate_id": {
+                                            "type": "string",
+                                            "description": "pay_rates\nOn line items of type `wage` and `overtime` you may pass a `pay_rate_id` and `hours` to\nautomatically calculate the `amount`.",
+                                            "writeOnly": true
+                                        },
+                                        "overtime_rate_id": {
+                                            "type": "string",
+                                            "description": "overtime_rates\nThe attribute must not be present unless the `earning_type` is `overtime`.\nOn line items of type `overtime` you may pass a `overtime_rate_id` and `hours` to\nautomatically calculate the `amount`.",
                                             "writeOnly": true
                                         },
                                         "amount": {
@@ -7752,16 +9552,22 @@
                                             "type": "number",
                                             "writeOnly": true
                                         },
-                                        "gl_code": {},
-                                        "title": {}
+                                        "gl_code": {
+                                            "type": "string",
+                                            "description": "A valid GL Code ID or value",
+                                            "writeOnly": true
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "writeOnly": true
+                                        }
                                     }
                                 },
                                 {
                                     "type": "object",
                                     "required": [
                                         "pay_stub_id",
-                                        "earning_type",
-                                        "amount"
+                                        "earning_type"
                                     ]
                                 }
                             ]
@@ -7777,11 +9583,41 @@
                             "properties": {
                                 "earning_type": {
                                     "type": "string",
-                                    "description": "earning_types",
+                                    "description": "`salary`, `wage`, `overtime`, `retroactive_pay`, `retroactive_pay_increase`, `commission`, `in_lieu_wages`, `bonus_discretionary`, `bonus_non_discretionary`, `vacation_pay`, `gratuity`, `pension`, `salary_continuance`, `death_benefit`, `severance_pay`, `retiring_allowance`, `invoice_payment`\nWriting may be blocked when entity is managed by a parent resource",
+                                    "writeOnly": true,
+                                    "enum": [
+                                        "salary",
+                                        "wage",
+                                        "overtime",
+                                        "retroactive_pay",
+                                        "retroactive_pay_increase",
+                                        "commission",
+                                        "in_lieu_wages",
+                                        "bonus_discretionary",
+                                        "bonus_non_discretionary",
+                                        "vacation_pay",
+                                        "gratuity",
+                                        "pension",
+                                        "salary_continuance",
+                                        "death_benefit",
+                                        "severance_pay",
+                                        "retiring_allowance",
+                                        "invoice_payment"
+                                    ]
+                                },
+                                "pay_rate_id": {
+                                    "type": "string",
+                                    "description": "pay_rates\nWriting may be blocked when entity is managed by a parent resource",
+                                    "writeOnly": true
+                                },
+                                "overtime_rate_id": {
+                                    "type": "string",
+                                    "description": "overtime_rates\nThe attribute must not be present unless the `earning_type` is `overtime`.",
                                     "writeOnly": true
                                 },
                                 "amount": {
                                     "type": "number",
+                                    "description": "Writing may be blocked when entity is managed by a parent resource",
                                     "writeOnly": true
                                 },
                                 "amount_override": {
@@ -7796,8 +9632,16 @@
                                     "type": "number",
                                     "writeOnly": true
                                 },
-                                "gl_code": {},
-                                "title": {}
+                                "gl_code": {
+                                    "type": "string",
+                                    "description": "A valid GL Code ID or value\nWriting may be blocked when entity is managed by a parent resource",
+                                    "writeOnly": true
+                                },
+                                "title": {
+                                    "type": "string",
+                                    "description": "Writing may be blocked when entity is managed by a parent resource",
+                                    "writeOnly": true
+                                }
                             }
                         }
                     }
@@ -7813,9 +9657,9 @@
                                     "properties": {
                                         "data": {
                                             "type": "array",
-                                            "writeOnly": true,
                                             "items": {
-                                                "type": "object"
+                                                "type": "string",
+                                                "format": "ulid"
                                             }
                                         }
                                     }
@@ -7841,9 +9685,8 @@
                                     "properties": {
                                         "data": {
                                             "type": "array",
-                                            "writeOnly": true,
                                             "items": {
-                                                "type": "object"
+                                                "$ref": "#/components/schemas/Employee"
                                             }
                                         }
                                     }
@@ -7851,9 +9694,7 @@
                                 {
                                     "type": "object",
                                     "required": [
-                                        "data",
-                                        "data.*.first_name",
-                                        "data.*.last_name"
+                                        "data"
                                     ]
                                 }
                             ]
@@ -7869,19 +9710,55 @@
                                 {
                                     "type": "object",
                                     "properties": {
-                                        "employee_number": {},
-                                        "first_name": {},
-                                        "last_name": {},
-                                        "middle_initial": {},
+                                        "employee_number": {
+                                            "type": "string",
+                                            "writeOnly": true
+                                        },
+                                        "first_name": {
+                                            "type": "string",
+                                            "writeOnly": true
+                                        },
+                                        "last_name": {
+                                            "type": "string",
+                                            "writeOnly": true
+                                        },
+                                        "middle_initial": {
+                                            "type": "string",
+                                            "writeOnly": true
+                                        },
                                         "personal_email": {},
                                         "work_email": {},
-                                        "address_line_1": {},
-                                        "address_line_2": {},
-                                        "city": {},
+                                        "address_line_1": {
+                                            "type": "string",
+                                            "writeOnly": true
+                                        },
+                                        "address_line_2": {
+                                            "type": "string",
+                                            "writeOnly": true
+                                        },
+                                        "city": {
+                                            "type": "string",
+                                            "writeOnly": true
+                                        },
                                         "province_code": {
                                             "type": "string",
                                             "description": "`AB`, `BC`, `MB`, `NB`, `NL`, `NS`, `NT`, `NU`, `ON`, `PE`, `QC`, `SK`, `YT`",
-                                            "writeOnly": true
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "AB",
+                                                "BC",
+                                                "MB",
+                                                "NB",
+                                                "NL",
+                                                "NS",
+                                                "NT",
+                                                "NU",
+                                                "ON",
+                                                "PE",
+                                                "QC",
+                                                "SK",
+                                                "YT"
+                                            ]
                                         },
                                         "country_code": {
                                             "type": "string",
@@ -7891,7 +9768,10 @@
                                                 "CA"
                                             ]
                                         },
-                                        "postal_code": {},
+                                        "postal_code": {
+                                            "type": "string",
+                                            "writeOnly": true
+                                        },
                                         "sin": {},
                                         "date_of_birth": {
                                             "type": "string",
@@ -7924,19 +9804,61 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "employee_number": {},
-                                "first_name": {},
-                                "last_name": {},
-                                "middle_initial": {},
-                                "personal_email": {},
-                                "work_email": {},
-                                "address_line_1": {},
-                                "address_line_2": {},
-                                "city": {},
+                                "employee_number": {
+                                    "type": "string",
+                                    "writeOnly": true
+                                },
+                                "first_name": {
+                                    "type": "string",
+                                    "writeOnly": true
+                                },
+                                "last_name": {
+                                    "type": "string",
+                                    "writeOnly": true
+                                },
+                                "middle_initial": {
+                                    "type": "string",
+                                    "writeOnly": true
+                                },
+                                "personal_email": {
+                                    "type": "string",
+                                    "writeOnly": true
+                                },
+                                "work_email": {
+                                    "type": "string",
+                                    "writeOnly": true
+                                },
+                                "address_line_1": {
+                                    "type": "string",
+                                    "writeOnly": true
+                                },
+                                "address_line_2": {
+                                    "type": "string",
+                                    "writeOnly": true
+                                },
+                                "city": {
+                                    "type": "string",
+                                    "writeOnly": true
+                                },
                                 "province_code": {
                                     "type": "string",
                                     "description": "`AB`, `BC`, `MB`, `NB`, `NL`, `NS`, `NT`, `NU`, `ON`, `PE`, `QC`, `SK`, `YT`",
-                                    "writeOnly": true
+                                    "writeOnly": true,
+                                    "enum": [
+                                        "AB",
+                                        "BC",
+                                        "MB",
+                                        "NB",
+                                        "NL",
+                                        "NS",
+                                        "NT",
+                                        "NU",
+                                        "ON",
+                                        "PE",
+                                        "QC",
+                                        "SK",
+                                        "YT"
+                                    ]
                                 },
                                 "country_code": {
                                     "type": "string",
@@ -7946,7 +9868,10 @@
                                         "CA"
                                     ]
                                 },
-                                "postal_code": {},
+                                "postal_code": {
+                                    "type": "string",
+                                    "writeOnly": true
+                                },
                                 "sin": {},
                                 "date_of_birth": {
                                     "type": "string",
@@ -8215,33 +10140,56 @@
                                     "properties": {
                                         "business_entity_id": {
                                             "type": "string",
-                                            "description": "One of `business_entity_id`, `pay_schedule_id` or `payroll_id` must be set.",
+                                            "description": "The attribute must be present when `pay_schedule_id` and `payroll_id` is either empty or not set.\nOne of `business_entity_id`, `pay_schedule_id` or `payroll_id` must be set.",
                                             "format": "ulid",
                                             "writeOnly": true
                                         },
                                         "pay_schedule_id": {
                                             "type": "string",
-                                            "description": "One of `business_entity_id`, `pay_schedule_id` or `payroll_id` must be set.",
+                                            "description": "The attribute must be present when `business_entity_id` and `payroll_id` is either empty or not set.\nOne of `business_entity_id`, `pay_schedule_id` or `payroll_id` must be set.",
                                             "format": "ulid",
                                             "writeOnly": true
                                         },
                                         "payroll_id": {
                                             "type": "string",
-                                            "description": "One of `business_entity_id`, `pay_schedule_id` or `payroll_id` must be set.",
+                                            "description": "The attribute must be present when `business_entity_id` and `pay_schedule_id` is either empty or not set.\nOne of `business_entity_id`, `pay_schedule_id` or `payroll_id` must be set.",
                                             "format": "ulid",
                                             "writeOnly": true
                                         },
-                                        "filters.payroll_type": {},
-                                        "filters.payroll_status": {},
-                                        "filters.pay_date_from": {
-                                            "type": "string",
-                                            "format": "date",
-                                            "writeOnly": true
-                                        },
-                                        "filters.pay_date_to": {
-                                            "type": "string",
-                                            "format": "date",
-                                            "writeOnly": true
+                                        "filters": {
+                                            "type": "object",
+                                            "description": "Options to allow filtering the content of the report",
+                                            "writeOnly": true,
+                                            "properties": {
+                                                "payroll_type": {
+                                                    "type": "array",
+                                                    "description": "One or more values from `regular`, `off_cycle`, `historical`",
+                                                    "writeOnly": true,
+                                                    "items": {
+                                                        "type": "string",
+                                                        "writeOnly": true
+                                                    }
+                                                },
+                                                "payroll_status": {
+                                                    "type": "array",
+                                                    "description": "One or more values from `draft`, `approved`, `processing`, `paid`, `partially_paid`, `failed`",
+                                                    "writeOnly": true,
+                                                    "items": {
+                                                        "type": "string",
+                                                        "writeOnly": true
+                                                    }
+                                                },
+                                                "pay_date_from": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "writeOnly": true
+                                                },
+                                                "pay_date_to": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "writeOnly": true
+                                                }
+                                            }
                                         }
                                     }
                                 },
@@ -8268,9 +10216,9 @@
                                     "properties": {
                                         "data": {
                                             "type": "array",
-                                            "writeOnly": true,
                                             "items": {
-                                                "type": "object"
+                                                "type": "string",
+                                                "format": "ulid"
                                             }
                                         }
                                     }
@@ -8278,8 +10226,7 @@
                                 {
                                     "type": "object",
                                     "required": [
-                                        "data",
-                                        "data.*.line_item_type"
+                                        "data"
                                     ]
                                 }
                             ]
@@ -8307,12 +10254,78 @@
                                 {
                                     "type": "object",
                                     "required": [
-                                        "data",
-                                        "data.*.pay_stub_id",
-                                        "data.*.line_item_type"
+                                        "data"
                                     ]
                                 }
                             ]
+                        }
+                    }
+                }
+            },
+            "OvertimeRateStore": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "pay_rate_id": {
+                                            "type": "string",
+                                            "format": "ulid",
+                                            "writeOnly": true
+                                        },
+                                        "rate_multiplier": {
+                                            "type": "number",
+                                            "description": "The multiplier for this overtime, e.g `1.5` or `2`.",
+                                            "writeOnly": true
+                                        },
+                                        "hourly_rate_override": {
+                                            "type": "number",
+                                            "description": "If set, this amount is used for the hourly rate, not the calculated amount from the `rate_multiplier`.",
+                                            "writeOnly": true
+                                        },
+                                        "archived_at": {
+                                            "type": "string",
+                                            "format": "date",
+                                            "writeOnly": true
+                                        }
+                                    }
+                                },
+                                {
+                                    "type": "object",
+                                    "required": [
+                                        "pay_rate_id",
+                                        "rate_multiplier"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "OvertimeRateUpdate": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "rate_multiplier": {
+                                    "type": "number",
+                                    "description": "The multiplier for this overtime, e.g `1.5` or `2`.",
+                                    "writeOnly": true
+                                },
+                                "hourly_rate_override": {
+                                    "type": "number",
+                                    "description": "If set, this amount is used for the hourly rate, not the calculated amount from the `rate_multiplier`.",
+                                    "writeOnly": true
+                                },
+                                "archived_at": {
+                                    "type": "string",
+                                    "format": "date",
+                                    "writeOnly": true
+                                }
+                            }
                         }
                     }
                 }
@@ -8360,7 +10373,11 @@
                                             "format": "date",
                                             "writeOnly": true
                                         },
-                                        "gl_code": {}
+                                        "gl_code": {
+                                            "type": "string",
+                                            "description": "A valid GL Code ID or value",
+                                            "writeOnly": true
+                                        }
                                     }
                                 },
                                 {
@@ -8411,7 +10428,11 @@
                                     "writeOnly": true
                                 },
                                 "effective_to": {},
-                                "gl_code": {}
+                                "gl_code": {
+                                    "type": "string",
+                                    "description": "A valid GL Code ID or value",
+                                    "writeOnly": true
+                                }
                             }
                         }
                     }
@@ -8495,7 +10516,10 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "title": {},
+                                "title": {
+                                    "type": "string",
+                                    "writeOnly": true
+                                },
                                 "pay_frequency": {
                                     "type": "string",
                                     "description": "`weekly`, `bi-weekly`, `semi-monthly`, `monthly`",
@@ -8562,9 +10586,14 @@
                                             "format": "ulid",
                                             "writeOnly": true
                                         },
-                                        "pay_by_cheque": {
-                                            "type": "boolean",
-                                            "writeOnly": true
+                                        "payment_method": {
+                                            "type": "string",
+                                            "description": "`direct_deposit`, `manual`",
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "direct_deposit",
+                                                "manual"
+                                            ]
                                         },
                                         "note": {}
                                     }
@@ -8587,9 +10616,14 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "pay_by_cheque": {
-                                    "type": "boolean",
-                                    "writeOnly": true
+                                "payment_method": {
+                                    "type": "string",
+                                    "description": "`direct_deposit`, `manual`",
+                                    "writeOnly": true,
+                                    "enum": [
+                                        "direct_deposit",
+                                        "manual"
+                                    ]
                                 },
                                 "note": {}
                             }
@@ -8617,8 +10651,7 @@
                                 {
                                     "type": "object",
                                     "required": [
-                                        "data",
-                                        "data.*.employee_id"
+                                        "data"
                                     ]
                                 }
                             ]
@@ -8674,7 +10707,11 @@
                                         "type": {
                                             "type": "string",
                                             "description": "`off_cycle`, `historical`",
-                                            "writeOnly": true
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "off_cycle",
+                                                "historical"
+                                            ]
                                         },
                                         "note": {}
                                     }
@@ -9380,7 +11417,7 @@
                                 {
                                     "type": "object",
                                     "properties": {
-                                        "reimbursement_template_id": {
+                                        "business_entity_reimbursement_id": {
                                             "type": "string",
                                             "format": "ulid",
                                             "writeOnly": true
@@ -9392,8 +11429,12 @@
                                         },
                                         "reimbursement_type": {
                                             "type": "string",
-                                            "description": "reimbursement_types",
-                                            "writeOnly": true
+                                            "description": "`non_taxable_reimbursement`, `taxable_reimbursement`\nThe attribute must be present when `business_entity_reimbursement_id` is either empty or not set.",
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "non_taxable_reimbursement",
+                                                "taxable_reimbursement"
+                                            ]
                                         },
                                         "amount": {
                                             "type": "number",
@@ -9402,7 +11443,12 @@
                                         "frequency": {
                                             "type": "string",
                                             "description": "`once`, `per_payroll`, `per_month`",
-                                            "writeOnly": true
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "once",
+                                                "per_payroll",
+                                                "per_month"
+                                            ]
                                         },
                                         "effective_from": {
                                             "type": "string",
@@ -9414,7 +11460,11 @@
                                             "format": "date",
                                             "writeOnly": true
                                         },
-                                        "gl_code": {},
+                                        "gl_code": {
+                                            "type": "string",
+                                            "description": "A valid GL Code ID or value",
+                                            "writeOnly": true
+                                        },
                                         "title": {}
                                     }
                                 },
@@ -9452,7 +11502,11 @@
                                     "format": "date",
                                     "writeOnly": true
                                 },
-                                "gl_code": {},
+                                "gl_code": {
+                                    "type": "string",
+                                    "description": "A valid GL Code ID or value",
+                                    "writeOnly": true
+                                },
                                 "title": {}
                             }
                         }
@@ -9474,8 +11528,12 @@
                                         },
                                         "reimbursement_type": {
                                             "type": "string",
-                                            "description": "reimbursement_types",
-                                            "writeOnly": true
+                                            "description": "`non_taxable_reimbursement`, `taxable_reimbursement`",
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "non_taxable_reimbursement",
+                                                "taxable_reimbursement"
+                                            ]
                                         },
                                         "amount": {
                                             "type": "number",
@@ -9485,7 +11543,11 @@
                                             "type": "number",
                                             "writeOnly": true
                                         },
-                                        "gl_code": {},
+                                        "gl_code": {
+                                            "type": "string",
+                                            "description": "A valid GL Code ID or value",
+                                            "writeOnly": true
+                                        },
                                         "title": {}
                                     }
                                 },
@@ -9509,66 +11571,30 @@
                             "properties": {
                                 "reimbursement_type": {
                                     "type": "string",
-                                    "description": "reimbursement_types",
-                                    "writeOnly": true
+                                    "description": "`non_taxable_reimbursement`, `taxable_reimbursement`\nWriting may be blocked when entity is managed by a parent resource",
+                                    "writeOnly": true,
+                                    "enum": [
+                                        "non_taxable_reimbursement",
+                                        "taxable_reimbursement"
+                                    ]
                                 },
                                 "amount": {
                                     "type": "number",
+                                    "description": "Writing may be blocked when entity is managed by a parent resource",
                                     "writeOnly": true
                                 },
                                 "amount_override": {
                                     "type": "number",
                                     "writeOnly": true
                                 },
-                                "gl_code": {},
-                                "title": {}
-                            }
-                        }
-                    }
-                }
-            },
-            "ReimbursementTemplateStore": {
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "business_entity_id": {
-                                            "type": "string",
-                                            "format": "ulid",
-                                            "writeOnly": true
-                                        },
-                                        "title": {},
-                                        "reimbursement_type": {
-                                            "type": "string",
-                                            "description": "reimbursement_types",
-                                            "writeOnly": true
-                                        },
-                                        "gl_code": {}
-                                    }
+                                "gl_code": {
+                                    "type": "string",
+                                    "description": "A valid GL Code ID or value\nWriting may be blocked when entity is managed by a parent resource",
+                                    "writeOnly": true
                                 },
-                                {
-                                    "type": "object",
-                                    "required": [
-                                        "business_entity_id",
-                                        "reimbursement_type"
-                                    ]
+                                "title": {
+                                    "description": "Writing may be blocked when entity is managed by a parent resource"
                                 }
-                            ]
-                        }
-                    }
-                }
-            },
-            "ReimbursementTemplateUpdate": {
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "title": {},
-                                "gl_code": {}
                             }
                         }
                     }
@@ -9714,11 +11740,13 @@
                                     "properties": {
                                         "employee_id": {
                                             "type": "string",
+                                            "description": "The attribute must be present when `contractor_id` is either empty or not set.",
                                             "format": "ulid",
                                             "writeOnly": true
                                         },
                                         "contractor_id": {
                                             "type": "string",
+                                            "description": "The attribute must be present when `employee_id` is either empty or not set.",
                                             "format": "ulid",
                                             "writeOnly": true
                                         },
@@ -9731,6 +11759,29 @@
                                         "tax_jurisdiction": {
                                             "type": "string",
                                             "description": "`AB`, `BC`, `MB`, `NB`, `NL`, `NS`, `NT`, `NU`, `ON`, `PE`, `QC`, `SK`, `YT`",
+                                            "writeOnly": true,
+                                            "enum": [
+                                                "AB",
+                                                "BC",
+                                                "MB",
+                                                "NB",
+                                                "NL",
+                                                "NS",
+                                                "NT",
+                                                "NU",
+                                                "ON",
+                                                "PE",
+                                                "QC",
+                                                "SK",
+                                                "YT"
+                                            ]
+                                        },
+                                        "is_cpp_exempt": {
+                                            "type": "boolean",
+                                            "writeOnly": true
+                                        },
+                                        "is_ei_exempt": {
+                                            "type": "boolean",
                                             "writeOnly": true
                                         },
                                         "archived_at": {
@@ -9762,6 +11813,29 @@
                                 "tax_jurisdiction": {
                                     "type": "string",
                                     "description": "`AB`, `BC`, `MB`, `NB`, `NL`, `NS`, `NT`, `NU`, `ON`, `PE`, `QC`, `SK`, `YT`",
+                                    "writeOnly": true,
+                                    "enum": [
+                                        "AB",
+                                        "BC",
+                                        "MB",
+                                        "NB",
+                                        "NL",
+                                        "NS",
+                                        "NT",
+                                        "NU",
+                                        "ON",
+                                        "PE",
+                                        "QC",
+                                        "SK",
+                                        "YT"
+                                    ]
+                                },
+                                "is_cpp_exempt": {
+                                    "type": "boolean",
+                                    "writeOnly": true
+                                },
+                                "is_ei_exempt": {
+                                    "type": "boolean",
                                     "writeOnly": true
                                 },
                                 "title": {},
@@ -9777,6 +11851,213 @@
             }
         },
         "responses": {
+            "AdjustmentDestroy": {
+                "description": "No Content",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Adjustment"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "AdjustmentIndex": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/Adjustment"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "example": {
+                            "object": "list",
+                            "data": [
+                                {
+                                    "id": "<id>",
+                                    "object": "adjustment",
+                                    "data": {
+                                        "expected_amount": 1100,
+                                        "pay_stub_note": null,
+                                        "admin_note": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": "/adjustments/<id>"
+                                    }
+                                }
+                            ],
+                            "links": {
+                                "first": "/adjustments?correction_pay_stub_id=<id>&page=1",
+                                "last": "/adjustments?correction_pay_stub_id=<id>&page=1",
+                                "prev": null,
+                                "next": null
+                            },
+                            "meta": {
+                                "current_page": 1,
+                                "last_page": 1,
+                                "per_page": 15,
+                                "total": 1,
+                                "has_more": false
+                            }
+                        }
+                    }
+                }
+            },
+            "AdjustmentShow": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Adjustment"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "adjustment",
+                            "data": {
+                                "expected_amount": 1100,
+                                "pay_stub_note": null,
+                                "admin_note": null,
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/adjustments/<id>"
+                            }
+                        }
+                    }
+                }
+            },
+            "AdjustmentStore": {
+                "description": "Created",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Adjustment"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "adjustment",
+                            "data": {
+                                "expected_amount": 50,
+                                "pay_stub_note": "Pay stub note",
+                                "admin_note": "Admin note",
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/adjustments/<id>"
+                            }
+                        }
+                    }
+                }
+            },
+            "AdjustmentUpdate": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Adjustment"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "adjustment",
+                            "data": {
+                                "expected_amount": 1000,
+                                "pay_stub_note": null,
+                                "admin_note": null,
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/adjustments/<id>"
+                            }
+                        }
+                    }
+                }
+            },
             "AllowanceDestroy": {
                 "description": "No Content",
                 "content": {
@@ -9827,7 +12108,7 @@
                                             {
                                                 "type": "object",
                                                 "properties": {
-                                                    "allowance_template": {
+                                                    "business_entity_allowance": {
                                                         "type": "object",
                                                         "nullable": true,
                                                         "properties": {
@@ -9839,7 +12120,7 @@
                                                                 "type": "string"
                                                             },
                                                             "data": {
-                                                                "$ref": "#/components/schemas/AllowanceTemplate"
+                                                                "$ref": "#/components/schemas/BusinessEntityAllowance"
                                                             }
                                                         }
                                                     }
@@ -9896,18 +12177,18 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance",
                                     "data": {
                                         "work_assignment": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "work_assignment",
                                             "links": {
-                                                "self": "/work_assignments/<ulid>"
+                                                "self": "/work_assignments/<id>"
                                             }
                                         },
                                         "allowance_type": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "allowance_type",
                                             "data": {
                                                 "type": "automobile_and_motor_vehicle",
@@ -9928,18 +12209,18 @@
                                         "frequency": "per_payroll",
                                         "effective_from": "2023-01-01",
                                         "effective_to": null,
-                                        "allowance_template": null,
+                                        "business_entity_allowance": null,
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/allowances/<ulid>"
+                                        "self": "/allowances/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/allowances?work_assignment_id=<ulid>&page=1",
-                                "last": "/allowances?work_assignment_id=<ulid>&page=1",
+                                "first": "/allowances?work_assignment_id=<id>&page=1",
+                                "last": "/allowances?work_assignment_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -9976,7 +12257,7 @@
                                         {
                                             "type": "object",
                                             "properties": {
-                                                "allowance_template": {
+                                                "business_entity_allowance": {
                                                     "type": "object",
                                                     "nullable": true,
                                                     "properties": {
@@ -9988,7 +12269,7 @@
                                                             "type": "string"
                                                         },
                                                         "data": {
-                                                            "$ref": "#/components/schemas/AllowanceTemplate"
+                                                            "$ref": "#/components/schemas/BusinessEntityAllowance"
                                                         }
                                                     }
                                                 }
@@ -10041,18 +12322,18 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "allowance",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
                                 "allowance_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "automobile_and_motor_vehicle",
@@ -10073,12 +12354,12 @@
                                 "frequency": "per_payroll",
                                 "effective_from": "2023-01-01",
                                 "effective_to": null,
-                                "allowance_template": null,
+                                "business_entity_allowance": null,
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/allowances/<ulid>"
+                                "self": "/allowances/<id>"
                             }
                         }
                     }
@@ -10108,18 +12389,18 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "allowance",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
                                 "allowance_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "automobile_and_motor_vehicle",
@@ -10140,12 +12421,12 @@
                                 "frequency": "per_payroll",
                                 "effective_from": "2023-01-01",
                                 "effective_to": null,
-                                "allowance_template": null,
+                                "business_entity_allowance": null,
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/allowances/<ulid>"
+                                "self": "/allowances/<id>"
                             }
                         }
                     }
@@ -10175,18 +12456,18 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "allowance",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
                                 "allowance_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "automobile_and_motor_vehicle",
@@ -10207,12 +12488,12 @@
                                 "frequency": "per_payroll",
                                 "effective_from": "2023-01-01",
                                 "effective_to": null,
-                                "allowance_template": null,
+                                "business_entity_allowance": null,
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/allowances/<ulid>"
+                                "self": "/allowances/<id>"
                             }
                         }
                     }
@@ -10316,14 +12597,14 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_line_item",
                                     "data": {
                                         "pay_stub": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_stub",
                                             "links": {
-                                                "self": "/pay_stubs/<ulid>"
+                                                "self": "/pay_stubs/<id>"
                                             }
                                         },
                                         "line_item_type": "allowance",
@@ -10331,7 +12612,7 @@
                                         "amount": 35,
                                         "amount_override": null,
                                         "allowance_type": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "allowance_type",
                                             "data": {
                                                 "type": "automobile_and_motor_vehicle",
@@ -10353,13 +12634,13 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/allowance_line_items/<ulid>"
+                                        "self": "/allowance_line_items/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/allowance_line_items?pay_stub_id=<ulid>&page=1",
-                                "last": "/allowance_line_items?pay_stub_id=<ulid>&page=1",
+                                "first": "/allowance_line_items?pay_stub_id=<id>&page=1",
+                                "last": "/allowance_line_items?pay_stub_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -10440,14 +12721,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "allowance_line_item",
                             "data": {
                                 "pay_stub": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_stub",
                                     "links": {
-                                        "self": "/pay_stubs/<ulid>"
+                                        "self": "/pay_stubs/<id>"
                                     }
                                 },
                                 "line_item_type": "allowance",
@@ -10455,7 +12736,7 @@
                                 "amount": 35,
                                 "amount_override": null,
                                 "allowance_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "automobile_and_motor_vehicle",
@@ -10477,7 +12758,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/allowance_line_items/<ulid>"
+                                "self": "/allowance_line_items/<id>"
                             }
                         }
                     }
@@ -10507,14 +12788,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "allowance_line_item",
                             "data": {
                                 "pay_stub": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_stub",
                                     "links": {
-                                        "self": "/pay_stubs/<ulid>"
+                                        "self": "/pay_stubs/<id>"
                                     }
                                 },
                                 "line_item_type": "allowance",
@@ -10522,7 +12803,7 @@
                                 "amount": 35,
                                 "amount_override": null,
                                 "allowance_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "automobile_and_motor_vehicle",
@@ -10544,7 +12825,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/allowance_line_items/<ulid>"
+                                "self": "/allowance_line_items/<id>"
                             }
                         }
                     }
@@ -10574,14 +12855,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "allowance_line_item",
                             "data": {
                                 "pay_stub": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_stub",
                                     "links": {
-                                        "self": "/pay_stubs/<ulid>"
+                                        "self": "/pay_stubs/<id>"
                                     }
                                 },
                                 "line_item_type": "allowance",
@@ -10589,7 +12870,7 @@
                                 "amount": 35,
                                 "amount_override": null,
                                 "allowance_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "automobile_and_motor_vehicle",
@@ -10611,386 +12892,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/allowance_line_items/<ulid>"
-                            }
-                        }
-                    }
-                }
-            },
-            "AllowanceTemplateDestroy": {
-                "description": "No Content",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "format": "ulid"
-                                },
-                                "object": {
-                                    "type": "string"
-                                },
-                                "data": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/AllowanceTemplate"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "AllowanceTemplateIndex": {
-                "description": "OK",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "format": "ulid"
-                                },
-                                "object": {
-                                    "type": "string"
-                                },
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "allOf": [
-                                            {
-                                                "$ref": "#/components/schemas/AllowanceTemplate"
-                                            },
-                                            {
-                                                "type": "object",
-                                                "properties": {
-                                                    "business_entity": {
-                                                        "type": "object",
-                                                        "nullable": true,
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "string",
-                                                                "format": "ulid"
-                                                            },
-                                                            "object": {
-                                                                "type": "string"
-                                                            },
-                                                            "data": {
-                                                                "$ref": "#/components/schemas/BusinessEntity"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "type": "object",
-                                                "properties": {
-                                                    "gl_code": {
-                                                        "type": "object",
-                                                        "nullable": true,
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "string",
-                                                                "format": "ulid"
-                                                            },
-                                                            "object": {
-                                                                "type": "string"
-                                                            },
-                                                            "data": {
-                                                                "$ref": "#/components/schemas/GlCode"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        ]
-                                    }
-                                }
-                            }
-                        },
-                        "example": {
-                            "object": "list",
-                            "data": [
-                                {
-                                    "id": "<ulid>",
-                                    "object": "allowance_template",
-                                    "data": {
-                                        "business_entity": {
-                                            "id": "<ulid>",
-                                            "object": "business_entity",
-                                            "links": {
-                                                "self": "/business_entities/<ulid>"
-                                            }
-                                        },
-                                        "title": null,
-                                        "allowance_type": {
-                                            "id": "<ulid>",
-                                            "object": "allowance_type",
-                                            "data": {
-                                                "type": "automobile_and_motor_vehicle",
-                                                "label": "Vehicle allowance",
-                                                "is_taxable": true,
-                                                "is_insurable": true,
-                                                "is_pensionable": true,
-                                                "t4_code": null,
-                                                "created_at": "2023-01-01T00:00:00.000000Z",
-                                                "updated_at": "2023-01-01T00:00:00.000000Z"
-                                            },
-                                            "links": {
-                                                "self": null
-                                            }
-                                        },
-                                        "created_at": "2023-01-01T00:00:00.000000Z",
-                                        "updated_at": "2023-01-01T00:00:00.000000Z"
-                                    },
-                                    "links": {
-                                        "self": "/allowance_templates/<ulid>"
-                                    }
-                                }
-                            ],
-                            "links": {
-                                "first": "/allowance_templates?business_entity_id=<ulid>&page=1",
-                                "last": "/allowance_templates?business_entity_id=<ulid>&page=1",
-                                "prev": null,
-                                "next": null
-                            },
-                            "meta": {
-                                "current_page": 1,
-                                "last_page": 1,
-                                "per_page": 15,
-                                "total": 1,
-                                "has_more": false
-                            }
-                        }
-                    }
-                }
-            },
-            "AllowanceTemplateShow": {
-                "description": "OK",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "format": "ulid"
-                                },
-                                "object": {
-                                    "type": "string"
-                                },
-                                "data": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/AllowanceTemplate"
-                                        },
-                                        {
-                                            "type": "object",
-                                            "properties": {
-                                                "business_entity": {
-                                                    "type": "object",
-                                                    "nullable": true,
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string",
-                                                            "format": "ulid"
-                                                        },
-                                                        "object": {
-                                                            "type": "string"
-                                                        },
-                                                        "data": {
-                                                            "$ref": "#/components/schemas/BusinessEntity"
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "type": "object",
-                                            "properties": {
-                                                "gl_code": {
-                                                    "type": "object",
-                                                    "nullable": true,
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string",
-                                                            "format": "ulid"
-                                                        },
-                                                        "object": {
-                                                            "type": "string"
-                                                        },
-                                                        "data": {
-                                                            "$ref": "#/components/schemas/GlCode"
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        },
-                        "example": {
-                            "id": "<ulid>",
-                            "object": "allowance_template",
-                            "data": {
-                                "business_entity": {
-                                    "id": "<ulid>",
-                                    "object": "business_entity",
-                                    "links": {
-                                        "self": "/business_entities/<ulid>"
-                                    }
-                                },
-                                "title": null,
-                                "allowance_type": {
-                                    "id": "<ulid>",
-                                    "object": "allowance_type",
-                                    "data": {
-                                        "type": "automobile_and_motor_vehicle",
-                                        "label": "Vehicle allowance",
-                                        "is_taxable": true,
-                                        "is_insurable": true,
-                                        "is_pensionable": true,
-                                        "t4_code": null,
-                                        "created_at": "2023-01-01T00:00:00.000000Z",
-                                        "updated_at": "2023-01-01T00:00:00.000000Z"
-                                    },
-                                    "links": {
-                                        "self": null
-                                    }
-                                },
-                                "created_at": "2023-01-01T00:00:00.000000Z",
-                                "updated_at": "2023-01-01T00:00:00.000000Z"
-                            },
-                            "links": {
-                                "self": "/allowance_templates/<ulid>"
-                            }
-                        }
-                    }
-                }
-            },
-            "AllowanceTemplateStore": {
-                "description": "Created",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "format": "ulid"
-                                },
-                                "object": {
-                                    "type": "string"
-                                },
-                                "data": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/AllowanceTemplate"
-                                        }
-                                    ]
-                                }
-                            }
-                        },
-                        "example": {
-                            "id": "<ulid>",
-                            "object": "allowance_template",
-                            "data": {
-                                "business_entity": {
-                                    "id": "<ulid>",
-                                    "object": "business_entity",
-                                    "links": {
-                                        "self": "/business_entities/<ulid>"
-                                    }
-                                },
-                                "title": null,
-                                "allowance_type": {
-                                    "id": "<ulid>",
-                                    "object": "allowance_type",
-                                    "data": {
-                                        "type": "automobile_and_motor_vehicle",
-                                        "label": "Vehicle allowance",
-                                        "is_taxable": true,
-                                        "is_insurable": true,
-                                        "is_pensionable": true,
-                                        "t4_code": null,
-                                        "created_at": "2023-01-01T00:00:00.000000Z",
-                                        "updated_at": "2023-01-01T00:00:00.000000Z"
-                                    },
-                                    "links": {
-                                        "self": null
-                                    }
-                                },
-                                "created_at": "2023-01-01T00:00:00.000000Z",
-                                "updated_at": "2023-01-01T00:00:00.000000Z"
-                            },
-                            "links": {
-                                "self": "/allowance_templates/<ulid>"
-                            }
-                        }
-                    }
-                }
-            },
-            "AllowanceTemplateUpdate": {
-                "description": "OK",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "format": "ulid"
-                                },
-                                "object": {
-                                    "type": "string"
-                                },
-                                "data": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/AllowanceTemplate"
-                                        }
-                                    ]
-                                }
-                            }
-                        },
-                        "example": {
-                            "id": "<ulid>",
-                            "object": "allowance_template",
-                            "data": {
-                                "business_entity": {
-                                    "id": "<ulid>",
-                                    "object": "business_entity",
-                                    "links": {
-                                        "self": "/business_entities/<ulid>"
-                                    }
-                                },
-                                "title": null,
-                                "allowance_type": {
-                                    "id": "<ulid>",
-                                    "object": "allowance_type",
-                                    "data": {
-                                        "type": "automobile_and_motor_vehicle",
-                                        "label": "Vehicle allowance",
-                                        "is_taxable": true,
-                                        "is_insurable": true,
-                                        "is_pensionable": true,
-                                        "t4_code": null,
-                                        "created_at": "2023-01-01T00:00:00.000000Z",
-                                        "updated_at": "2023-01-01T00:00:00.000000Z"
-                                    },
-                                    "links": {
-                                        "self": null
-                                    }
-                                },
-                                "created_at": "2023-01-01T00:00:00.000000Z",
-                                "updated_at": "2023-01-01T00:00:00.000000Z"
-                            },
-                            "links": {
-                                "self": "/allowance_templates/<ulid>"
+                                "self": "/allowance_line_items/<id>"
                             }
                         }
                     }
@@ -11026,7 +12928,7 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "automobile_and_motor_vehicle",
@@ -11043,7 +12945,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "taxable_cash_allowance",
@@ -11060,7 +12962,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "cell_phone_allowance",
@@ -11077,7 +12979,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "internet_allowance",
@@ -11094,7 +12996,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "child_care_expenses",
@@ -11111,7 +13013,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "child_eduction_taxable",
@@ -11128,7 +13030,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "child_eduction_non_taxable",
@@ -11145,7 +13047,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "housing_allowance_cash",
@@ -11162,7 +13064,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "overtime_meals_non_taxable",
@@ -11179,7 +13081,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "meals_taxable",
@@ -11196,7 +13098,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "moving_allowance_taxable",
@@ -11213,7 +13115,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "moving_allowance_non_taxable",
@@ -11230,7 +13132,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "municipal_officers_expense",
@@ -11247,7 +13149,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "parking_allowance",
@@ -11264,7 +13166,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "allowance_type",
                                     "data": {
                                         "type": "social_event_allowance",
@@ -11417,14 +13319,14 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "bank_account",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "account_number_last_3": "273",
@@ -11441,13 +13343,13 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/bank_accounts/<ulid>"
+                                        "self": "/bank_accounts/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/bank_accounts?business_entity_id=<ulid>&page=1",
-                                "last": "/bank_accounts?business_entity_id=<ulid>&page=1",
+                                "first": "/bank_accounts?business_entity_id=<id>&page=1",
+                                "last": "/bank_accounts?business_entity_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -11457,6 +13359,37 @@
                                 "per_page": 15,
                                 "total": 1,
                                 "has_more": false
+                            }
+                        }
+                    }
+                }
+            },
+            "BankAccountPad": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BankAccount"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "data": {
+                                "html": "<!-- This document is exported from google drive -->\n<html>\n  <head>\n    <meta content=\"text/html; charset=UTF-8\" http-equiv=\"content-type\">\n    <style type=\"text/css\">\n      @import url(https://themes.googleusercontent.com/fonts/css?kit=dpiI8CyVsrzWsJLBFKehGpLhv3qFjX7dUn1mYxfCXhI);\n\n      ol {\n        margin: 0;\n        padding: 0\n      }\n\n      table td,\n      table th {\n        padding: 0\n      }\n\n      .c12 {\n        border-right-style: solid;\n        padding-top: 0pt;\n        border-bottom-color: #000000;\n        border-right-width: 0pt;\n        padding-left: 0pt;\n        border-left-color: #000000;\n        padding-bottom: 0pt;\n        line-height: 1.857142857142857;\n        border-right-color: #000000;\n        border-left-width: 0pt;\n        background-color: #ffffff;\n        border-left-style: solid;\n        border-bottom-width: 0pt;\n        border-bottom-style: solid;\n        orphans: 2;\n        widows: 2;\n        text-align: left;\n        padding-right: 0pt\n      }\n\n      .c2 {\n        border-right-style: solid;\n        padding-top: 12pt;\n        border-bottom-color: #000000;\n        border-right-width: 0pt;\n        padding-left: 0pt;\n        border-left-color: #000000;\n        padding-bottom: 0pt;\n        line-height: 1.857142857142857;\n        border-right-color: #000000;\n        border-left-width: 0pt;\n        background-color: #ffffff;\n        border-left-style: solid;\n        border-bottom-width: 0pt;\n        border-bottom-style: solid;\n        orphans: 2;\n        widows: 2;\n        text-align: left;\n        padding-right: 0pt\n      }\n\n      .c0 {\n        color: #414552;\n        font-weight: 400;\n        text-decoration: none;\n        vertical-align: baseline;\n        font-size: 10.5pt;\n        font-family: \"Roboto\";\n        font-style: normal\n      }\n\n      .c4 {\n        background-color: #ffffff;\n        padding-top: 0pt;\n        padding-bottom: 0pt;\n        line-height: 1.1500000000000001;\n        orphans: 2;\n        widows: 2;\n        text-align: left\n      }\n\n      .c14 {\n        background-color: #ffffff;\n        padding-top: 0pt;\n        padding-bottom: 0pt;\n        line-height: 1.1500000000000001;\n        orphans: 2;\n        widows: 2;\n        text-align: center\n      }\n\n      .c3 {\n        color: #000000;\n        font-weight: 400;\n        text-decoration: none;\n        vertical-align: baseline;\n        font-size: 10.5pt;\n        font-family: \"Arial\";\n        font-style: normal\n      }\n\n      .c8 {\n        color: #414552;\n        text-decoration: none;\n        vertical-align: baseline;\n        font-family: \"Roboto\";\n        font-style: normal\n      }\n\n      .c11 {\n        text-decoration-skip-ink: none;\n        -webkit-text-decoration-skip: none;\n        color: #1155cc;\n        text-decoration: underline\n      }\n\n      .c13 {\n        background-color: #ffffff;\n        max-width: 468pt;\n        padding: 72pt 72pt 72pt 72pt\n      }\n\n      .c9 {\n        font-weight: 400;\n        font-size: 12pt\n      }\n\n      .c10 {\n        font-family: \"Roboto\";\n        color: #414552\n      }\n\n      .c1 {\n        color: inherit;\n        text-decoration: inherit\n      }\n\n      .c5 {\n        font-size: 10.5pt\n      }\n\n      .c7 {\n        height: 11pt\n      }\n\n      .c6 {\n        font-weight: 700\n      }\n\n      .title {\n        padding-top: 0pt;\n        color: #000000;\n        font-size: 26pt;\n        padding-bottom: 3pt;\n        font-family: \"Arial\";\n        line-height: 1.1500000000000001;\n        page-break-after: avoid;\n        orphans: 2;\n        widows: 2;\n        text-align: left\n      }\n\n      .subtitle {\n        padding-top: 0pt;\n        color: #666666;\n        font-size: 15pt;\n        padding-bottom: 16pt;\n        font-family: \"Arial\";\n        line-height: 1.1500000000000001;\n        page-break-after: avoid;\n        orphans: 2;\n        widows: 2;\n        text-align: left\n      }\n\n      li {\n        color: #000000;\n        font-size: 11pt;\n        font-family: \"Arial\"\n      }\n\n      p {\n        margin: 0;\n        color: #000000;\n        font-size: 11pt;\n        font-family: \"Arial\"\n      }\n\n      h1 {\n        padding-top: 20pt;\n        color: #000000;\n        font-size: 20pt;\n        padding-bottom: 6pt;\n        font-family: \"Arial\";\n        line-height: 1.1500000000000001;\n        page-break-after: avoid;\n        orphans: 2;\n        widows: 2;\n        text-align: left\n      }\n\n      h2 {\n        padding-top: 18pt;\n        color: #000000;\n        font-size: 16pt;\n        padding-bottom: 6pt;\n        font-family: \"Arial\";\n        line-height: 1.1500000000000001;\n        page-break-after: avoid;\n        orphans: 2;\n        widows: 2;\n        text-align: left\n      }\n\n      h3 {\n        padding-top: 16pt;\n        color: #434343;\n        font-size: 14pt;\n        padding-bottom: 4pt;\n        font-family: \"Arial\";\n        line-height: 1.1500000000000001;\n        page-break-after: avoid;\n        orphans: 2;\n        widows: 2;\n        text-align: left\n      }\n\n      h4 {\n        padding-top: 14pt;\n        color: #666666;\n        font-size: 12pt;\n        padding-bottom: 4pt;\n        font-family: \"Arial\";\n        line-height: 1.1500000000000001;\n        page-break-after: avoid;\n        orphans: 2;\n        widows: 2;\n        text-align: left\n      }\n\n      h5 {\n        padding-top: 12pt;\n        color: #666666;\n        font-size: 11pt;\n        padding-bottom: 4pt;\n        font-family: \"Arial\";\n        line-height: 1.1500000000000001;\n        page-break-after: avoid;\n        orphans: 2;\n        widows: 2;\n        text-align: left\n      }\n\n      h6 {\n        padding-top: 12pt;\n        color: #666666;\n        font-size: 11pt;\n        padding-bottom: 4pt;\n        font-family: \"Arial\";\n        line-height: 1.1500000000000001;\n        page-break-after: avoid;\n        font-style: italic;\n        orphans: 2;\n        widows: 2;\n        text-align: left\n      }\n    </style>\n  </head>\n  <body class=\"c13 doc-content\">\n    <p class=\"c14\">\n      <span class=\"c8 c5 c6\">PAD Agreement</span>\n    </p>\n    <p class=\"c4 c7\">\n      <span class=\"c0\"></span>\n    </p>\n    <p class=\"c14\">\n      <span class=\"c0\">The Nmbr Company Ltd.</span>\n    </p>\n    <p class=\"c14 c7\">\n      <span class=\"c0\"></span>\n    </p>\n    <p class=\"c4\">\n      <span class=\"c0\">40 Temperance Street - Suite 3200</span>\n    </p>\n    <p class=\"c4\">\n      <span class=\"c0\">Toronto, ON </span>\n    </p>\n    <p class=\"c4\">\n      <span class=\"c0\">M5H 0B4</span>\n    </p>\n    <p class=\"c4\">\n      <span class=\"c0\">Email: billing@nmbr.co</span>\n    </p>\n    <p class=\"c4\">\n      <span class=\"c0\">Pre-authorized debit agreement</span>\n    </p>\n    <p class=\"c2 c7\">\n      <span class=\"c0\"></span>\n    </p>\n    <p class=\"c2\">\n      <span class=\"c5 c6\">By accepting this Agreement, you acknowledge that you authorize The Nmbr Company Ltd. (Nmbr) to debit the specified bank account for any amount owed for charges arising from the use of services and/or purchase of products.</span>\n    </p>\n    <p class=\"c2\">\n      <span class=\"c3\">You acknowledge that this PAD Agreement is provided for the benefit of Nmbr and your financial institution, and in consideration of your financial institution agreeing to process debits against your account in accordance with Rule H1, and any other applicable rules of the Canadian Payments Association, as may be amended from time to time (&ldquo;Rule H1&rdquo;). The submission and acceptance of this PAD Agreement to Nmbr constitutes delivery by you of the same to your financial institution.</span>\n    </p>\n    <p class=\"c2\">\n      <span class=\"c3\">You hereby authorize Nmbr to debit/draw on your account specified above with your financial institution for the purpose of funding any third-party payments, which may include, without limitation, payroll/compensation payments to your employees and payments to taxing authorities on your behalf, as well as the fees and other charges for such services rendered by Nmbr (each such debit hereinafter referred to as a &ldquo;PAD&rdquo;). You understand and agree that the PADs will be for variable amounts as required to meet your obligations for payroll, taxes, fees, and other charges as contemplated in the applicable services agreement(s). The PADs will occur at recurring set intervals triggered by your pre-determined payroll processing schedule (regular and off-cycle) and corresponding funding deadline established by Nmbr in accordance with your services agreement for such payroll obligations, or for variable amounts as and when required in response to any other direct actions initiated by you either electronically, in writing, or by telephone. The PADs authorized and issued hereunder are &ldquo;Business PADs&rdquo; as defined in Rule H1.</span>\n    </p>\n    <p class=\"c12\">\n      <span class=\"c8 c5 c6\">You acknowledge and agree that the amounts debited may vary as instructed and approved by you, and as such, no pre-notification of PAD changes is required. </span>\n    </p>\n    <p class=\"c7 c12\">\n      <span class=\"c5 c6 c8\"></span>\n    </p>\n    <p class=\"c12\">\n      <span class=\"c5 c6 c10\">You further agree to a reduced confirmation period, whereby you will be notified of the first upcoming debit up to 1 (one) day before the payment is collected, instead of the standard 10 days.</span>\n    </p>\n    <p class=\"c2\">\n      <span class=\"c3\">You represent and warrant that as of the execution date of this PAD Agreement, all persons whose signatures are required to sign on the account identified above have read and accepted this PAD Agreement (or the names and specimen signatures of such persons have been provided to Nmbr in a separate document).</span>\n    </p>\n    <p class=\"c2\">\n      <span class=\"c3\">You may amend or cancel this authorization at any time by providing no less than thirty (30) days notice, prior to the next scheduled PAD, at billing@nmbr.co. This will not affect any debit transactions initiated prior to Nmbr acknowledging the amendment or cancellation. To obtain a sample cancellation form, or further information on cancelling a PAD agreement, please contact your financial institution or visit www.payments.ca.</span>\n    </p>\n    <p class=\"c2\">\n      <span class=\"c3\">This PAD Agreement applies only to the method of payment and does not otherwise affect the Agreement or any other applicable terms governing the Services to which this PAD Agreement relates. Revocation of the authorization granted hereunder does not in and of itself terminate any such Agreement(s) between you and Nmbr, however, you acknowledge that the performance of the Services requires that either a valid PAD Agreement be in place or another mutually acceptable method of payment be established between you and Nmbr.</span>\n    </p>\n    <p class=\"c2\">\n      <span class=\"c3\">You acknowledge that your financial institution is not required to verify that: (a) a PAD has been issued in accordance with this PAD Agreement including, but not limited to, the amount; or (b) any purpose of payment for which the PAD was issued has been fulfilled by Nmbr as a condition to honoring a PAD issued or caused to be issued by Nmbr on your account.</span>\n    </p>\n    <p class=\"c2\">\n      <span class=\"c5\">You have certain recourse rights if any debit does not comply with this agreement. For example, you have the right to receive reimbursement for any debit that is not authorized or is not consistent with this PAD Agreement. To obtain more information on your recourse rights, you can contact your financial institution or visit</span>\n      <span class=\"c5\">\n        <a class=\"c1\" href=\"https://www.google.com/url?q=http://www.payments.ca&amp;sa=D&amp;source=editors&amp;ust=1729537372076360&amp;usg=AOvVaw0ZCmf5Ec_ikMO0ZlXWXFQr\">&nbsp;</a>\n      </span>\n      <span class=\"c5 c11\">\n        <a class=\"c1\" href=\"https://www.google.com/url?q=http://www.payments.ca&amp;sa=D&amp;source=editors&amp;ust=1729537372076803&amp;usg=AOvVaw0hVGHwsbSYxW6JTFW2qicR\">www.payments.ca</a>\n      </span>\n      <span class=\"c3\">.</span>\n    </p>\n    <p class=\"c2\">\n      <span class=\"c3\">A PAD may be disputed by you if: (i) the PAD was not drawn in accordance with this PAD Agreement; or (ii) this PAD Agreement is revoked or terminated in accordance with the terms hereof (effective prior to such PAD being issued). To be reimbursed, you must complete and present a declaration to the branch of your financial institution in which your account is held no later than the close of business on the tenth (10th) business day after the date on which the PAD in dispute was debited from your account.</span>\n    </p>\n    <p class=\"c2\">\n      <span class=\"c3\">You acknowledge that, after such date, a claim on the basis that the PAD Agreement was revoked or terminated, or for any other reason, is a matter to be resolved solely between Nmbr and you.</span>\n    </p>\n    <p class=\"c2\">\n      <span class=\"c3\">You consent to the disclosure of any personal information contained herein to Nmbr&rsquo;s sponsoring member (as defined in Rule H1) as far as any such disclosure of personal information is directly related to and necessary for the proper application of Rule H1.</span>\n    </p>\n    <p class=\"c2\">\n      <span class=\"c3\">Any inquiries or notices relative to the PAD Agreement and the debits issued hereunder shall be directed to Nmbr at the address provided above.</span>\n    </p>\n    <p class=\"c2\">\n      <span class=\"c3\">Nmbr may assign this PAD Agreement without your consent provided that Nmbr has provided you with written notice of the details of such assignment including the identity and contact information of the assignee.</span>\n    </p>\n    <p class=\"c2\">\n      <span class=\"c3\">You hereby certify that all information supplied by you herein is true, complete, and accurate in every respect. You have caused an authorized signing officer of the Client to execute this PAD Agreement as of the date specified above.</span>\n    </p>\n    <p class=\"c12 c7\">\n      <span class=\"c8 c9\"></span>\n    </p>\n  </body>\n</html>"
                             }
                         }
                     }
@@ -11549,14 +13482,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "bank_account",
                             "data": {
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "account_number_last_3": "273",
@@ -11573,7 +13506,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/bank_accounts/<ulid>"
+                                "self": "/bank_accounts/<id>"
                             }
                         }
                     }
@@ -11603,14 +13536,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "bank_account",
                             "data": {
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "account_number_last_3": "273",
@@ -11627,7 +13560,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/bank_accounts/<ulid>"
+                                "self": "/bank_accounts/<id>"
                             }
                         }
                     }
@@ -11657,14 +13590,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "bank_account",
                             "data": {
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "account_number_last_3": "273",
@@ -11681,7 +13614,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/bank_accounts/<ulid>"
+                                "self": "/bank_accounts/<id>"
                             }
                         }
                     }
@@ -11810,7 +13743,7 @@
                                             {
                                                 "type": "object",
                                                 "properties": {
-                                                    "benefit_template": {
+                                                    "business_entity_benefit": {
                                                         "type": "object",
                                                         "nullable": true,
                                                         "properties": {
@@ -11822,7 +13755,7 @@
                                                                 "type": "string"
                                                             },
                                                             "data": {
-                                                                "$ref": "#/components/schemas/BenefitTemplate"
+                                                                "$ref": "#/components/schemas/BusinessEntityBenefit"
                                                             }
                                                         }
                                                     }
@@ -11837,19 +13770,19 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit",
                                     "data": {
                                         "work_assignment": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "work_assignment",
                                             "links": {
-                                                "self": "/work_assignments/<ulid>"
+                                                "self": "/work_assignments/<id>"
                                             }
                                         },
-                                        "benefit_template": null,
+                                        "business_entity_benefit": null,
                                         "benefit_type": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "benefit_type",
                                             "data": {
                                                 "type": "health",
@@ -11868,6 +13801,7 @@
                                             }
                                         },
                                         "title": null,
+                                        "remittance_account_id": null,
                                         "company_contribution_amount": 35,
                                         "company_contribution_percent": null,
                                         "employee_contribution_amount": 45,
@@ -11881,13 +13815,13 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/benefits/<ulid>"
+                                        "self": "/benefits/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/benefits?work_assignment_id=<ulid>&page=1",
-                                "last": "/benefits?work_assignment_id=<ulid>&page=1",
+                                "first": "/benefits?work_assignment_id=<id>&page=1",
+                                "last": "/benefits?work_assignment_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -11945,7 +13879,7 @@
                                         {
                                             "type": "object",
                                             "properties": {
-                                                "benefit_template": {
+                                                "business_entity_benefit": {
                                                     "type": "object",
                                                     "nullable": true,
                                                     "properties": {
@@ -11957,7 +13891,7 @@
                                                             "type": "string"
                                                         },
                                                         "data": {
-                                                            "$ref": "#/components/schemas/BenefitTemplate"
+                                                            "$ref": "#/components/schemas/BusinessEntityBenefit"
                                                         }
                                                     }
                                                 }
@@ -11968,19 +13902,19 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "benefit",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
-                                "benefit_template": null,
+                                "business_entity_benefit": null,
                                 "benefit_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "health",
@@ -11999,6 +13933,7 @@
                                     }
                                 },
                                 "title": null,
+                                "remittance_account_id": null,
                                 "company_contribution_amount": 35,
                                 "company_contribution_percent": null,
                                 "employee_contribution_amount": 45,
@@ -12012,7 +13947,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/benefits/<ulid>"
+                                "self": "/benefits/<id>"
                             }
                         }
                     }
@@ -12042,19 +13977,19 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "benefit",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
-                                "benefit_template": null,
+                                "business_entity_benefit": null,
                                 "benefit_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "health",
@@ -12073,6 +14008,7 @@
                                     }
                                 },
                                 "title": null,
+                                "remittance_account_id": null,
                                 "company_contribution_amount": 35,
                                 "company_contribution_percent": null,
                                 "employee_contribution_amount": 45,
@@ -12086,7 +14022,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/benefits/<ulid>"
+                                "self": "/benefits/<id>"
                             }
                         }
                     }
@@ -12116,19 +14052,19 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "benefit",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
-                                "benefit_template": null,
+                                "business_entity_benefit": null,
                                 "benefit_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "health",
@@ -12147,6 +14083,7 @@
                                     }
                                 },
                                 "title": null,
+                                "remittance_account_id": null,
                                 "company_contribution_amount": 35,
                                 "company_contribution_percent": null,
                                 "employee_contribution_amount": 45,
@@ -12160,7 +14097,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/benefits/<ulid>"
+                                "self": "/benefits/<id>"
                             }
                         }
                     }
@@ -12264,21 +14201,21 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_line_item",
                                     "data": {
                                         "pay_stub": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_stub",
                                             "links": {
-                                                "self": "/pay_stubs/<ulid>"
+                                                "self": "/pay_stubs/<id>"
                                             }
                                         },
                                         "line_item_type": "benefit",
                                         "is_managed": false,
                                         "amount": 45,
                                         "benefit_type": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "benefit_type",
                                             "data": {
                                                 "type": "health",
@@ -12302,17 +14239,18 @@
                                         "employee_contribution_amount_override": null,
                                         "recurrence": null,
                                         "title": null,
+                                        "remittance_account_id": null,
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/benefit_line_items/<ulid>"
+                                        "self": "/benefit_line_items/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/benefit_line_items?pay_stub_id=<ulid>&page=1",
-                                "last": "/benefit_line_items?pay_stub_id=<ulid>&page=1",
+                                "first": "/benefit_line_items?pay_stub_id=<id>&page=1",
+                                "last": "/benefit_line_items?pay_stub_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -12393,21 +14331,21 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "benefit_line_item",
                             "data": {
                                 "pay_stub": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_stub",
                                     "links": {
-                                        "self": "/pay_stubs/<ulid>"
+                                        "self": "/pay_stubs/<id>"
                                     }
                                 },
                                 "line_item_type": "benefit",
                                 "is_managed": false,
                                 "amount": 45,
                                 "benefit_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "health",
@@ -12431,11 +14369,12 @@
                                 "employee_contribution_amount_override": null,
                                 "recurrence": null,
                                 "title": null,
+                                "remittance_account_id": null,
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/benefit_line_items/<ulid>"
+                                "self": "/benefit_line_items/<id>"
                             }
                         }
                     }
@@ -12465,21 +14404,21 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "benefit_line_item",
                             "data": {
                                 "pay_stub": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_stub",
                                     "links": {
-                                        "self": "/pay_stubs/<ulid>"
+                                        "self": "/pay_stubs/<id>"
                                     }
                                 },
                                 "line_item_type": "benefit",
                                 "is_managed": false,
                                 "amount": 45,
                                 "benefit_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "health",
@@ -12503,11 +14442,12 @@
                                 "employee_contribution_amount_override": null,
                                 "recurrence": null,
                                 "title": null,
+                                "remittance_account_id": null,
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/benefit_line_items/<ulid>"
+                                "self": "/benefit_line_items/<id>"
                             }
                         }
                     }
@@ -12537,21 +14477,21 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "benefit_line_item",
                             "data": {
                                 "pay_stub": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_stub",
                                     "links": {
-                                        "self": "/pay_stubs/<ulid>"
+                                        "self": "/pay_stubs/<id>"
                                     }
                                 },
                                 "line_item_type": "benefit",
                                 "is_managed": false,
                                 "amount": 45,
                                 "benefit_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "health",
@@ -12575,398 +14515,12 @@
                                 "employee_contribution_amount_override": null,
                                 "recurrence": null,
                                 "title": null,
+                                "remittance_account_id": null,
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/benefit_line_items/<ulid>"
-                            }
-                        }
-                    }
-                }
-            },
-            "BenefitTemplateDestroy": {
-                "description": "No Content",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "format": "ulid"
-                                },
-                                "object": {
-                                    "type": "string"
-                                },
-                                "data": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/BenefitTemplate"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "BenefitTemplateIndex": {
-                "description": "OK",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "format": "ulid"
-                                },
-                                "object": {
-                                    "type": "string"
-                                },
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "allOf": [
-                                            {
-                                                "$ref": "#/components/schemas/BenefitTemplate"
-                                            },
-                                            {
-                                                "type": "object",
-                                                "properties": {
-                                                    "business_entity": {
-                                                        "type": "object",
-                                                        "nullable": true,
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "string",
-                                                                "format": "ulid"
-                                                            },
-                                                            "object": {
-                                                                "type": "string"
-                                                            },
-                                                            "data": {
-                                                                "$ref": "#/components/schemas/BusinessEntity"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "type": "object",
-                                                "properties": {
-                                                    "gl_code": {
-                                                        "type": "object",
-                                                        "nullable": true,
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "string",
-                                                                "format": "ulid"
-                                                            },
-                                                            "object": {
-                                                                "type": "string"
-                                                            },
-                                                            "data": {
-                                                                "$ref": "#/components/schemas/GlCode"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        ]
-                                    }
-                                }
-                            }
-                        },
-                        "example": {
-                            "object": "list",
-                            "data": [
-                                {
-                                    "id": "<ulid>",
-                                    "object": "benefit_template",
-                                    "data": {
-                                        "business_entity": {
-                                            "id": "<ulid>",
-                                            "object": "business_entity",
-                                            "links": {
-                                                "self": "/business_entities/<ulid>"
-                                            }
-                                        },
-                                        "title": null,
-                                        "benefit_type": {
-                                            "id": "<ulid>",
-                                            "object": "benefit_type",
-                                            "data": {
-                                                "type": "health",
-                                                "label": "Health",
-                                                "is_taxable": false,
-                                                "is_employee_amount_pre_tax": false,
-                                                "is_insurable": false,
-                                                "is_subject_to_qpip": false,
-                                                "is_pensionable": false,
-                                                "t4_code": null,
-                                                "created_at": "2023-01-01T00:00:00.000000Z",
-                                                "updated_at": "2023-01-01T00:00:00.000000Z"
-                                            },
-                                            "links": {
-                                                "self": null
-                                            }
-                                        },
-                                        "created_at": "2023-01-01T00:00:00.000000Z",
-                                        "updated_at": "2023-01-01T00:00:00.000000Z"
-                                    },
-                                    "links": {
-                                        "self": "/benefit_templates/<ulid>"
-                                    }
-                                }
-                            ],
-                            "links": {
-                                "first": "/benefit_templates?business_entity_id=<ulid>&page=1",
-                                "last": "/benefit_templates?business_entity_id=<ulid>&page=1",
-                                "prev": null,
-                                "next": null
-                            },
-                            "meta": {
-                                "current_page": 1,
-                                "last_page": 1,
-                                "per_page": 15,
-                                "total": 1,
-                                "has_more": false
-                            }
-                        }
-                    }
-                }
-            },
-            "BenefitTemplateShow": {
-                "description": "OK",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "format": "ulid"
-                                },
-                                "object": {
-                                    "type": "string"
-                                },
-                                "data": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/BenefitTemplate"
-                                        },
-                                        {
-                                            "type": "object",
-                                            "properties": {
-                                                "business_entity": {
-                                                    "type": "object",
-                                                    "nullable": true,
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string",
-                                                            "format": "ulid"
-                                                        },
-                                                        "object": {
-                                                            "type": "string"
-                                                        },
-                                                        "data": {
-                                                            "$ref": "#/components/schemas/BusinessEntity"
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "type": "object",
-                                            "properties": {
-                                                "gl_code": {
-                                                    "type": "object",
-                                                    "nullable": true,
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string",
-                                                            "format": "ulid"
-                                                        },
-                                                        "object": {
-                                                            "type": "string"
-                                                        },
-                                                        "data": {
-                                                            "$ref": "#/components/schemas/GlCode"
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        },
-                        "example": {
-                            "id": "<ulid>",
-                            "object": "benefit_template",
-                            "data": {
-                                "business_entity": {
-                                    "id": "<ulid>",
-                                    "object": "business_entity",
-                                    "links": {
-                                        "self": "/business_entities/<ulid>"
-                                    }
-                                },
-                                "title": null,
-                                "benefit_type": {
-                                    "id": "<ulid>",
-                                    "object": "benefit_type",
-                                    "data": {
-                                        "type": "health",
-                                        "label": "Health",
-                                        "is_taxable": false,
-                                        "is_employee_amount_pre_tax": false,
-                                        "is_insurable": false,
-                                        "is_subject_to_qpip": false,
-                                        "is_pensionable": false,
-                                        "t4_code": null,
-                                        "created_at": "2023-01-01T00:00:00.000000Z",
-                                        "updated_at": "2023-01-01T00:00:00.000000Z"
-                                    },
-                                    "links": {
-                                        "self": null
-                                    }
-                                },
-                                "created_at": "2023-01-01T00:00:00.000000Z",
-                                "updated_at": "2023-01-01T00:00:00.000000Z"
-                            },
-                            "links": {
-                                "self": "/benefit_templates/<ulid>"
-                            }
-                        }
-                    }
-                }
-            },
-            "BenefitTemplateStore": {
-                "description": "Created",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "format": "ulid"
-                                },
-                                "object": {
-                                    "type": "string"
-                                },
-                                "data": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/BenefitTemplate"
-                                        }
-                                    ]
-                                }
-                            }
-                        },
-                        "example": {
-                            "id": "<ulid>",
-                            "object": "benefit_template",
-                            "data": {
-                                "business_entity": {
-                                    "id": "<ulid>",
-                                    "object": "business_entity",
-                                    "links": {
-                                        "self": "/business_entities/<ulid>"
-                                    }
-                                },
-                                "title": null,
-                                "benefit_type": {
-                                    "id": "<ulid>",
-                                    "object": "benefit_type",
-                                    "data": {
-                                        "type": "health",
-                                        "label": "Health",
-                                        "is_taxable": false,
-                                        "is_employee_amount_pre_tax": false,
-                                        "is_insurable": false,
-                                        "is_subject_to_qpip": false,
-                                        "is_pensionable": false,
-                                        "t4_code": null,
-                                        "created_at": "2023-01-01T00:00:00.000000Z",
-                                        "updated_at": "2023-01-01T00:00:00.000000Z"
-                                    },
-                                    "links": {
-                                        "self": null
-                                    }
-                                },
-                                "created_at": "2023-01-01T00:00:00.000000Z",
-                                "updated_at": "2023-01-01T00:00:00.000000Z"
-                            },
-                            "links": {
-                                "self": "/benefit_templates/<ulid>"
-                            }
-                        }
-                    }
-                }
-            },
-            "BenefitTemplateUpdate": {
-                "description": "OK",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "format": "ulid"
-                                },
-                                "object": {
-                                    "type": "string"
-                                },
-                                "data": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/BenefitTemplate"
-                                        }
-                                    ]
-                                }
-                            }
-                        },
-                        "example": {
-                            "id": "<ulid>",
-                            "object": "benefit_template",
-                            "data": {
-                                "business_entity": {
-                                    "id": "<ulid>",
-                                    "object": "business_entity",
-                                    "links": {
-                                        "self": "/business_entities/<ulid>"
-                                    }
-                                },
-                                "title": null,
-                                "benefit_type": {
-                                    "id": "<ulid>",
-                                    "object": "benefit_type",
-                                    "data": {
-                                        "type": "health",
-                                        "label": "Health",
-                                        "is_taxable": false,
-                                        "is_employee_amount_pre_tax": false,
-                                        "is_insurable": false,
-                                        "is_subject_to_qpip": false,
-                                        "is_pensionable": false,
-                                        "t4_code": null,
-                                        "created_at": "2023-01-01T00:00:00.000000Z",
-                                        "updated_at": "2023-01-01T00:00:00.000000Z"
-                                    },
-                                    "links": {
-                                        "self": null
-                                    }
-                                },
-                                "created_at": "2023-01-01T00:00:00.000000Z",
-                                "updated_at": "2023-01-01T00:00:00.000000Z"
-                            },
-                            "links": {
-                                "self": "/benefit_templates/<ulid>"
+                                "self": "/benefit_line_items/<id>"
                             }
                         }
                     }
@@ -13002,7 +14556,7 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "accident_insurance_plan",
@@ -13021,7 +14575,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "critical_illness",
@@ -13040,16 +14594,16 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "dental",
                                         "label": "Dental",
-                                        "is_taxable": true,
-                                        "is_employee_amount_pre_tax": true,
+                                        "is_taxable": false,
+                                        "is_employee_amount_pre_tax": false,
                                         "is_insurable": false,
                                         "is_subject_to_qpip": false,
-                                        "is_pensionable": true,
+                                        "is_pensionable": false,
                                         "t4_code": null,
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
@@ -13059,7 +14613,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "health",
@@ -13078,7 +14632,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "group_term_life_insurance",
@@ -13095,7 +14649,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "short_term_disability",
@@ -13114,7 +14668,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "non_group_short_term_disability",
@@ -13133,7 +14687,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "long_term_disability",
@@ -13152,7 +14706,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "non_group_long_term_disability",
@@ -13171,7 +14725,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "pension_dcpp",
@@ -13190,7 +14744,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "pension_dbpp",
@@ -13209,7 +14763,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "pension_rrsp",
@@ -13228,7 +14782,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "pension_restricted_rrsp",
@@ -13247,7 +14801,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "pension_prpp",
@@ -13266,7 +14820,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "benefit_type",
                                     "data": {
                                         "type": "pension_unregistered_prpp",
@@ -13445,7 +14999,7 @@
                                             {
                                                 "type": "object",
                                                 "properties": {
-                                                    "benefit_templates": {
+                                                    "business_entity_benefits": {
                                                         "type": "object",
                                                         "nullable": true,
                                                         "properties": {
@@ -13459,7 +15013,7 @@
                                                             "data": {
                                                                 "type": "array",
                                                                 "items": {
-                                                                    "$ref": "#/components/schemas/BenefitTemplate"
+                                                                    "$ref": "#/components/schemas/BusinessEntityBenefit"
                                                                 }
                                                             }
                                                         }
@@ -13469,7 +15023,7 @@
                                             {
                                                 "type": "object",
                                                 "properties": {
-                                                    "allowance_templates": {
+                                                    "business_entity_allowances": {
                                                         "type": "object",
                                                         "nullable": true,
                                                         "properties": {
@@ -13483,7 +15037,7 @@
                                                             "data": {
                                                                 "type": "array",
                                                                 "items": {
-                                                                    "$ref": "#/components/schemas/AllowanceTemplate"
+                                                                    "$ref": "#/components/schemas/BusinessEntityAllowance"
                                                                 }
                                                             }
                                                         }
@@ -13493,7 +15047,7 @@
                                             {
                                                 "type": "object",
                                                 "properties": {
-                                                    "reimbursement_templates": {
+                                                    "business_entity_reimbursements": {
                                                         "type": "object",
                                                         "nullable": true,
                                                         "properties": {
@@ -13507,7 +15061,7 @@
                                                             "data": {
                                                                 "type": "array",
                                                                 "items": {
-                                                                    "$ref": "#/components/schemas/ReimbursementTemplate"
+                                                                    "$ref": "#/components/schemas/BusinessEntityReimbursement"
                                                                 }
                                                             }
                                                         }
@@ -13523,7 +15077,7 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "data": {
                                         "business_number": "123456789RP0001",
@@ -13545,10 +15099,10 @@
                                         "remitter_type": "regular",
                                         "status": "approved",
                                         "company": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "company",
                                             "links": {
-                                                "self": "/companies/<ulid>"
+                                                "self": "/companies/<id>"
                                             }
                                         },
                                         "warnings": {
@@ -13613,7 +15167,7 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 }
                             ],
@@ -13749,7 +15303,7 @@
                                         {
                                             "type": "object",
                                             "properties": {
-                                                "benefit_templates": {
+                                                "business_entity_benefits": {
                                                     "type": "object",
                                                     "nullable": true,
                                                     "properties": {
@@ -13763,7 +15317,7 @@
                                                         "data": {
                                                             "type": "array",
                                                             "items": {
-                                                                "$ref": "#/components/schemas/BenefitTemplate"
+                                                                "$ref": "#/components/schemas/BusinessEntityBenefit"
                                                             }
                                                         }
                                                     }
@@ -13773,7 +15327,7 @@
                                         {
                                             "type": "object",
                                             "properties": {
-                                                "allowance_templates": {
+                                                "business_entity_allowances": {
                                                     "type": "object",
                                                     "nullable": true,
                                                     "properties": {
@@ -13787,7 +15341,7 @@
                                                         "data": {
                                                             "type": "array",
                                                             "items": {
-                                                                "$ref": "#/components/schemas/AllowanceTemplate"
+                                                                "$ref": "#/components/schemas/BusinessEntityAllowance"
                                                             }
                                                         }
                                                     }
@@ -13797,7 +15351,7 @@
                                         {
                                             "type": "object",
                                             "properties": {
-                                                "reimbursement_templates": {
+                                                "business_entity_reimbursements": {
                                                     "type": "object",
                                                     "nullable": true,
                                                     "properties": {
@@ -13811,7 +15365,7 @@
                                                         "data": {
                                                             "type": "array",
                                                             "items": {
-                                                                "$ref": "#/components/schemas/ReimbursementTemplate"
+                                                                "$ref": "#/components/schemas/BusinessEntityReimbursement"
                                                             }
                                                         }
                                                     }
@@ -13823,7 +15377,7 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "business_entity",
                             "data": {
                                 "business_number": "123456789RP0001",
@@ -13845,10 +15399,10 @@
                                 "remitter_type": "regular",
                                 "status": "approved",
                                 "company": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "company",
                                     "links": {
-                                        "self": "/companies/<ulid>"
+                                        "self": "/companies/<id>"
                                     }
                                 },
                                 "warnings": {
@@ -13913,7 +15467,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/business_entities/<ulid>"
+                                "self": "/business_entities/<id>"
                             }
                         }
                     }
@@ -13943,7 +15497,7 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "business_entity",
                             "data": {
                                 "business_number": "123456789RP0001",
@@ -13965,10 +15519,10 @@
                                 "remitter_type": "regular",
                                 "status": "onboarding",
                                 "company": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "company",
                                     "links": {
-                                        "self": "/companies/<ulid>"
+                                        "self": "/companies/<id>"
                                     }
                                 },
                                 "warnings": {
@@ -14033,7 +15587,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/business_entities/<ulid>"
+                                "self": "/business_entities/<id>"
                             }
                         }
                     }
@@ -14063,7 +15617,7 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "business_entity",
                             "data": {
                                 "business_number": "123456789RP0001",
@@ -14085,10 +15639,10 @@
                                 "remitter_type": "regular",
                                 "status": "approved",
                                 "company": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "company",
                                     "links": {
-                                        "self": "/companies/<ulid>"
+                                        "self": "/companies/<id>"
                                     }
                                 },
                                 "warnings": {
@@ -14153,13 +15707,39 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/business_entities/<ulid>"
+                                "self": "/business_entities/<id>"
                             }
                         }
                     }
                 }
             },
-            "BusinessEntityDeductionLineItemIndex": {
+            "BusinessEntityAllowanceDestroy": {
+                "description": "No Content",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BusinessEntityAllowance"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityAllowanceIndex": {
                 "description": "OK",
                 "content": {
                     "application/json": {
@@ -14178,12 +15758,12 @@
                                     "items": {
                                         "allOf": [
                                             {
-                                                "$ref": "#/components/schemas/BusinessEntityDeductionLineItem"
+                                                "$ref": "#/components/schemas/BusinessEntityAllowance"
                                             },
                                             {
                                                 "type": "object",
                                                 "properties": {
-                                                    "pay_stub": {
+                                                    "business_entity": {
                                                         "type": "object",
                                                         "nullable": true,
                                                         "properties": {
@@ -14195,7 +15775,28 @@
                                                                 "type": "string"
                                                             },
                                                             "data": {
-                                                                "$ref": "#/components/schemas/PayStub"
+                                                                "$ref": "#/components/schemas/BusinessEntity"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "gl_code": {
+                                                        "type": "object",
+                                                        "nullable": true,
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "ulid"
+                                                            },
+                                                            "object": {
+                                                                "type": "string"
+                                                            },
+                                                            "data": {
+                                                                "$ref": "#/components/schemas/GlCode"
                                                             }
                                                         }
                                                     }
@@ -14210,25 +15811,27 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
-                                    "object": "business_entity_deduction_line_item",
+                                    "id": "<id>",
+                                    "object": "business_entity_allowance",
                                     "data": {
-                                        "pay_stub": {
-                                            "id": "<ulid>",
-                                            "object": "pay_stub",
+                                        "business_entity": {
+                                            "id": "<id>",
+                                            "object": "business_entity",
                                             "links": {
-                                                "self": "/pay_stubs/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
-                                        "line_item_type": "business_entity_deduction",
-                                        "is_managed": true,
-                                        "amount": 1235.11,
-                                        "business_entity_deduction_type": {
-                                            "id": "<ulid>",
-                                            "object": "business_entity_deduction_type",
+                                        "title": null,
+                                        "allowance_type": {
+                                            "id": "<id>",
+                                            "object": "allowance_type",
                                             "data": {
-                                                "type": "ei",
-                                                "label": "EI",
+                                                "type": "automobile_and_motor_vehicle",
+                                                "label": "Vehicle allowance",
+                                                "is_taxable": true,
+                                                "is_insurable": true,
+                                                "is_pensionable": true,
+                                                "t4_code": null,
                                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                                             },
@@ -14236,88 +15839,17 @@
                                                 "self": null
                                             }
                                         },
-                                        "title": null,
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/business_entity_deduction_line_items/<ulid>"
-                                    }
-                                },
-                                {
-                                    "id": "<ulid>",
-                                    "object": "business_entity_deduction_line_item",
-                                    "data": {
-                                        "pay_stub": {
-                                            "id": "<ulid>",
-                                            "object": "pay_stub",
-                                            "links": {
-                                                "self": "/pay_stubs/<ulid>"
-                                            }
-                                        },
-                                        "line_item_type": "business_entity_deduction",
-                                        "is_managed": true,
-                                        "amount": 2101.43,
-                                        "business_entity_deduction_type": {
-                                            "id": "<ulid>",
-                                            "object": "business_entity_deduction_type",
-                                            "data": {
-                                                "type": "cpp",
-                                                "label": "CPP",
-                                                "created_at": "2023-01-01T00:00:00.000000Z",
-                                                "updated_at": "2023-01-01T00:00:00.000000Z"
-                                            },
-                                            "links": {
-                                                "self": null
-                                            }
-                                        },
-                                        "title": null,
-                                        "created_at": "2023-01-01T00:00:00.000000Z",
-                                        "updated_at": "2023-01-01T00:00:00.000000Z"
-                                    },
-                                    "links": {
-                                        "self": "/business_entity_deduction_line_items/<ulid>"
-                                    }
-                                },
-                                {
-                                    "id": "<ulid>",
-                                    "object": "business_entity_deduction_line_item",
-                                    "data": {
-                                        "pay_stub": {
-                                            "id": "<ulid>",
-                                            "object": "pay_stub",
-                                            "links": {
-                                                "self": "/pay_stubs/<ulid>"
-                                            }
-                                        },
-                                        "line_item_type": "business_entity_deduction",
-                                        "is_managed": true,
-                                        "amount": 355.22,
-                                        "business_entity_deduction_type": {
-                                            "id": "<ulid>",
-                                            "object": "business_entity_deduction_type",
-                                            "data": {
-                                                "type": "cpp_2",
-                                                "label": "CPP 2",
-                                                "created_at": "2023-01-01T00:00:00.000000Z",
-                                                "updated_at": "2023-01-01T00:00:00.000000Z"
-                                            },
-                                            "links": {
-                                                "self": null
-                                            }
-                                        },
-                                        "title": null,
-                                        "created_at": "2023-01-01T00:00:00.000000Z",
-                                        "updated_at": "2023-01-01T00:00:00.000000Z"
-                                    },
-                                    "links": {
-                                        "self": "/business_entity_deduction_line_items/<ulid>"
+                                        "self": "/business_entity_allowances/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/business_entity_deduction_line_items?pay_stub_id=<ulid>&page=1",
-                                "last": "/business_entity_deduction_line_items?pay_stub_id=<ulid>&page=1",
+                                "first": "/business_entity_allowances?business_entity_id=<id>&page=1",
+                                "last": "/business_entity_allowances?business_entity_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -14325,8 +15857,1389 @@
                                 "current_page": 1,
                                 "last_page": 1,
                                 "per_page": 15,
-                                "total": 3,
+                                "total": 1,
                                 "has_more": false
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityAllowanceShow": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BusinessEntityAllowance"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "business_entity": {
+                                                    "type": "object",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "ulid"
+                                                        },
+                                                        "object": {
+                                                            "type": "string"
+                                                        },
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/BusinessEntity"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "gl_code": {
+                                                    "type": "object",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "ulid"
+                                                        },
+                                                        "object": {
+                                                            "type": "string"
+                                                        },
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/GlCode"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "business_entity_allowance",
+                            "data": {
+                                "business_entity": {
+                                    "id": "<id>",
+                                    "object": "business_entity",
+                                    "links": {
+                                        "self": "/business_entities/<id>"
+                                    }
+                                },
+                                "title": null,
+                                "allowance_type": {
+                                    "id": "<id>",
+                                    "object": "allowance_type",
+                                    "data": {
+                                        "type": "automobile_and_motor_vehicle",
+                                        "label": "Vehicle allowance",
+                                        "is_taxable": true,
+                                        "is_insurable": true,
+                                        "is_pensionable": true,
+                                        "t4_code": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": null
+                                    }
+                                },
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/business_entity_allowances/<id>"
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityAllowanceStore": {
+                "description": "Created",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BusinessEntityAllowance"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "business_entity_allowance",
+                            "data": {
+                                "business_entity": {
+                                    "id": "<id>",
+                                    "object": "business_entity",
+                                    "links": {
+                                        "self": "/business_entities/<id>"
+                                    }
+                                },
+                                "title": null,
+                                "allowance_type": {
+                                    "id": "<id>",
+                                    "object": "allowance_type",
+                                    "data": {
+                                        "type": "automobile_and_motor_vehicle",
+                                        "label": "Vehicle allowance",
+                                        "is_taxable": true,
+                                        "is_insurable": true,
+                                        "is_pensionable": true,
+                                        "t4_code": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": null
+                                    }
+                                },
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/business_entity_allowances/<id>"
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityAllowanceUpdate": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BusinessEntityAllowance"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "business_entity_allowance",
+                            "data": {
+                                "business_entity": {
+                                    "id": "<id>",
+                                    "object": "business_entity",
+                                    "links": {
+                                        "self": "/business_entities/<id>"
+                                    }
+                                },
+                                "title": null,
+                                "allowance_type": {
+                                    "id": "<id>",
+                                    "object": "allowance_type",
+                                    "data": {
+                                        "type": "automobile_and_motor_vehicle",
+                                        "label": "Vehicle allowance",
+                                        "is_taxable": true,
+                                        "is_insurable": true,
+                                        "is_pensionable": true,
+                                        "t4_code": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": null
+                                    }
+                                },
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/business_entity_allowances/<id>"
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityBenefitDestroy": {
+                "description": "No Content",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BusinessEntityBenefit"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityBenefitIndex": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/BusinessEntityBenefit"
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "business_entity": {
+                                                        "type": "object",
+                                                        "nullable": true,
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "ulid"
+                                                            },
+                                                            "object": {
+                                                                "type": "string"
+                                                            },
+                                                            "data": {
+                                                                "$ref": "#/components/schemas/BusinessEntity"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "gl_code": {
+                                                        "type": "object",
+                                                        "nullable": true,
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "ulid"
+                                                            },
+                                                            "object": {
+                                                                "type": "string"
+                                                            },
+                                                            "data": {
+                                                                "$ref": "#/components/schemas/GlCode"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "example": {
+                            "object": "list",
+                            "data": [
+                                {
+                                    "id": "<id>",
+                                    "object": "business_entity_benefit",
+                                    "data": {
+                                        "business_entity": {
+                                            "id": "<id>",
+                                            "object": "business_entity",
+                                            "links": {
+                                                "self": "/business_entities/<id>"
+                                            }
+                                        },
+                                        "title": null,
+                                        "benefit_type": {
+                                            "id": "<id>",
+                                            "object": "benefit_type",
+                                            "data": {
+                                                "type": "health",
+                                                "label": "Health",
+                                                "is_taxable": false,
+                                                "is_employee_amount_pre_tax": false,
+                                                "is_insurable": false,
+                                                "is_subject_to_qpip": false,
+                                                "is_pensionable": false,
+                                                "t4_code": null,
+                                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                                            },
+                                            "links": {
+                                                "self": null
+                                            }
+                                        },
+                                        "remittance_account_id": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": "/business_entity_benefits/<id>"
+                                    }
+                                }
+                            ],
+                            "links": {
+                                "first": "/business_entity_benefits?business_entity_id=<id>&page=1",
+                                "last": "/business_entity_benefits?business_entity_id=<id>&page=1",
+                                "prev": null,
+                                "next": null
+                            },
+                            "meta": {
+                                "current_page": 1,
+                                "last_page": 1,
+                                "per_page": 15,
+                                "total": 1,
+                                "has_more": false
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityBenefitShow": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BusinessEntityBenefit"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "business_entity": {
+                                                    "type": "object",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "ulid"
+                                                        },
+                                                        "object": {
+                                                            "type": "string"
+                                                        },
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/BusinessEntity"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "gl_code": {
+                                                    "type": "object",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "ulid"
+                                                        },
+                                                        "object": {
+                                                            "type": "string"
+                                                        },
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/GlCode"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "business_entity_benefit",
+                            "data": {
+                                "business_entity": {
+                                    "id": "<id>",
+                                    "object": "business_entity",
+                                    "links": {
+                                        "self": "/business_entities/<id>"
+                                    }
+                                },
+                                "title": null,
+                                "benefit_type": {
+                                    "id": "<id>",
+                                    "object": "benefit_type",
+                                    "data": {
+                                        "type": "health",
+                                        "label": "Health",
+                                        "is_taxable": false,
+                                        "is_employee_amount_pre_tax": false,
+                                        "is_insurable": false,
+                                        "is_subject_to_qpip": false,
+                                        "is_pensionable": false,
+                                        "t4_code": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": null
+                                    }
+                                },
+                                "remittance_account_id": null,
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/business_entity_benefits/<id>"
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityBenefitStore": {
+                "description": "Created",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BusinessEntityBenefit"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "business_entity_benefit",
+                            "data": {
+                                "business_entity": {
+                                    "id": "<id>",
+                                    "object": "business_entity",
+                                    "links": {
+                                        "self": "/business_entities/<id>"
+                                    }
+                                },
+                                "title": null,
+                                "benefit_type": {
+                                    "id": "<id>",
+                                    "object": "benefit_type",
+                                    "data": {
+                                        "type": "health",
+                                        "label": "Health",
+                                        "is_taxable": false,
+                                        "is_employee_amount_pre_tax": false,
+                                        "is_insurable": false,
+                                        "is_subject_to_qpip": false,
+                                        "is_pensionable": false,
+                                        "t4_code": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": null
+                                    }
+                                },
+                                "remittance_account_id": null,
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/business_entity_benefits/<id>"
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityBenefitUpdate": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BusinessEntityBenefit"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "business_entity_benefit",
+                            "data": {
+                                "business_entity": {
+                                    "id": "<id>",
+                                    "object": "business_entity",
+                                    "links": {
+                                        "self": "/business_entities/<id>"
+                                    }
+                                },
+                                "title": null,
+                                "benefit_type": {
+                                    "id": "<id>",
+                                    "object": "benefit_type",
+                                    "data": {
+                                        "type": "health",
+                                        "label": "Health",
+                                        "is_taxable": false,
+                                        "is_employee_amount_pre_tax": false,
+                                        "is_insurable": false,
+                                        "is_subject_to_qpip": false,
+                                        "is_pensionable": false,
+                                        "t4_code": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": null
+                                    }
+                                },
+                                "remittance_account_id": null,
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/business_entity_benefits/<id>"
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityDeductionDestroy": {
+                "description": "No Content",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BusinessEntityDeduction"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityDeductionIndex": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/BusinessEntityDeduction"
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "business_entity": {
+                                                        "type": "object",
+                                                        "nullable": true,
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "ulid"
+                                                            },
+                                                            "object": {
+                                                                "type": "string"
+                                                            },
+                                                            "data": {
+                                                                "$ref": "#/components/schemas/BusinessEntity"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "remittance_account": {
+                                                        "type": "object",
+                                                        "nullable": true,
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "ulid"
+                                                            },
+                                                            "object": {
+                                                                "type": "string"
+                                                            },
+                                                            "data": {
+                                                                "$ref": "#/components/schemas/RemittanceAccount"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "example": {
+                            "object": "list",
+                            "data": [
+                                {
+                                    "id": "<id>",
+                                    "object": "business_entity_deduction",
+                                    "data": {
+                                        "business_entity": {
+                                            "id": "<id>",
+                                            "object": "business_entity",
+                                            "links": {
+                                                "self": "/business_entities/<id>"
+                                            }
+                                        },
+                                        "title": null,
+                                        "deduction_type": {
+                                            "id": "<id>",
+                                            "object": "deduction_type",
+                                            "data": {
+                                                "type": "income_tax",
+                                                "label": "Income tax debt",
+                                                "is_taxable": null,
+                                                "is_insurable": null,
+                                                "is_pensionable": null,
+                                                "t4_code": null,
+                                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                                            },
+                                            "links": {
+                                                "self": null
+                                            }
+                                        },
+                                        "remittance_account": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": "/business_entity_deductions/<id>"
+                                    }
+                                }
+                            ],
+                            "links": {
+                                "first": "/business_entity_deductions?business_entity_id=<id>&page=1",
+                                "last": "/business_entity_deductions?business_entity_id=<id>&page=1",
+                                "prev": null,
+                                "next": null
+                            },
+                            "meta": {
+                                "current_page": 1,
+                                "last_page": 1,
+                                "per_page": 15,
+                                "total": 1,
+                                "has_more": false
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityDeductionShow": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BusinessEntityDeduction"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "business_entity": {
+                                                    "type": "object",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "ulid"
+                                                        },
+                                                        "object": {
+                                                            "type": "string"
+                                                        },
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/BusinessEntity"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "remittance_account": {
+                                                    "type": "object",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "ulid"
+                                                        },
+                                                        "object": {
+                                                            "type": "string"
+                                                        },
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/RemittanceAccount"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "business_entity_deduction",
+                            "data": {
+                                "business_entity": {
+                                    "id": "<id>",
+                                    "object": "business_entity",
+                                    "links": {
+                                        "self": "/business_entities/<id>"
+                                    }
+                                },
+                                "title": null,
+                                "deduction_type": {
+                                    "id": "<id>",
+                                    "object": "deduction_type",
+                                    "data": {
+                                        "type": "income_tax",
+                                        "label": "Income tax debt",
+                                        "is_taxable": null,
+                                        "is_insurable": null,
+                                        "is_pensionable": null,
+                                        "t4_code": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": null
+                                    }
+                                },
+                                "remittance_account": null,
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/business_entity_deductions/<id>"
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityDeductionStore": {
+                "description": "Created",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BusinessEntityDeduction"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "business_entity_deduction",
+                            "data": {
+                                "business_entity": {
+                                    "id": "<id>",
+                                    "object": "business_entity",
+                                    "links": {
+                                        "self": "/business_entities/<id>"
+                                    }
+                                },
+                                "title": null,
+                                "deduction_type": {
+                                    "id": "<id>",
+                                    "object": "deduction_type",
+                                    "data": {
+                                        "type": "income_tax",
+                                        "label": "Income tax debt",
+                                        "is_taxable": null,
+                                        "is_insurable": null,
+                                        "is_pensionable": null,
+                                        "t4_code": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": null
+                                    }
+                                },
+                                "remittance_account": null,
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/business_entity_deductions/<id>"
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityDeductionUpdate": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BusinessEntityDeduction"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "business_entity_deduction",
+                            "data": {
+                                "business_entity": {
+                                    "id": "<id>",
+                                    "object": "business_entity",
+                                    "links": {
+                                        "self": "/business_entities/<id>"
+                                    }
+                                },
+                                "title": null,
+                                "deduction_type": {
+                                    "id": "<id>",
+                                    "object": "deduction_type",
+                                    "data": {
+                                        "type": "income_tax",
+                                        "label": "Income tax debt",
+                                        "is_taxable": null,
+                                        "is_insurable": null,
+                                        "is_pensionable": null,
+                                        "t4_code": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": null
+                                    }
+                                },
+                                "remittance_account": null,
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/business_entity_deductions/<id>"
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityReimbursementDestroy": {
+                "description": "No Content",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BusinessEntityReimbursement"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityReimbursementIndex": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/BusinessEntityReimbursement"
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "business_entity": {
+                                                        "type": "object",
+                                                        "nullable": true,
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "ulid"
+                                                            },
+                                                            "object": {
+                                                                "type": "string"
+                                                            },
+                                                            "data": {
+                                                                "$ref": "#/components/schemas/BusinessEntity"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "gl_code": {
+                                                        "type": "object",
+                                                        "nullable": true,
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "ulid"
+                                                            },
+                                                            "object": {
+                                                                "type": "string"
+                                                            },
+                                                            "data": {
+                                                                "$ref": "#/components/schemas/GlCode"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "example": {
+                            "object": "list",
+                            "data": [
+                                {
+                                    "id": "<id>",
+                                    "object": "business_entity_reimbursement",
+                                    "data": {
+                                        "business_entity": {
+                                            "id": "<id>",
+                                            "object": "business_entity",
+                                            "links": {
+                                                "self": "/business_entities/<id>"
+                                            }
+                                        },
+                                        "title": null,
+                                        "reimbursement_type": {
+                                            "id": "<id>",
+                                            "object": "reimbursement_type",
+                                            "data": {
+                                                "type": "non_taxable_reimbursement",
+                                                "label": "Non-Taxable Reimbursement",
+                                                "is_taxable": false,
+                                                "is_insurable": false,
+                                                "is_pensionable": false,
+                                                "t4_code": null,
+                                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                                            },
+                                            "links": {
+                                                "self": null
+                                            }
+                                        },
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": "/business_entity_reimbursements/<id>"
+                                    }
+                                }
+                            ],
+                            "links": {
+                                "first": "/business_entity_reimbursements?business_entity_id=<id>&page=1",
+                                "last": "/business_entity_reimbursements?business_entity_id=<id>&page=1",
+                                "prev": null,
+                                "next": null
+                            },
+                            "meta": {
+                                "current_page": 1,
+                                "last_page": 1,
+                                "per_page": 15,
+                                "total": 1,
+                                "has_more": false
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityReimbursementShow": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BusinessEntityReimbursement"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "business_entity": {
+                                                    "type": "object",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "ulid"
+                                                        },
+                                                        "object": {
+                                                            "type": "string"
+                                                        },
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/BusinessEntity"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "gl_code": {
+                                                    "type": "object",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "ulid"
+                                                        },
+                                                        "object": {
+                                                            "type": "string"
+                                                        },
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/GlCode"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "business_entity_reimbursement",
+                            "data": {
+                                "business_entity": {
+                                    "id": "<id>",
+                                    "object": "business_entity",
+                                    "links": {
+                                        "self": "/business_entities/<id>"
+                                    }
+                                },
+                                "title": null,
+                                "reimbursement_type": {
+                                    "id": "<id>",
+                                    "object": "reimbursement_type",
+                                    "data": {
+                                        "type": "non_taxable_reimbursement",
+                                        "label": "Non-Taxable Reimbursement",
+                                        "is_taxable": false,
+                                        "is_insurable": false,
+                                        "is_pensionable": false,
+                                        "t4_code": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": null
+                                    }
+                                },
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/business_entity_reimbursements/<id>"
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityReimbursementStore": {
+                "description": "Created",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BusinessEntityReimbursement"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "business_entity_reimbursement",
+                            "data": {
+                                "business_entity": {
+                                    "id": "<id>",
+                                    "object": "business_entity",
+                                    "links": {
+                                        "self": "/business_entities/<id>"
+                                    }
+                                },
+                                "title": null,
+                                "reimbursement_type": {
+                                    "id": "<id>",
+                                    "object": "reimbursement_type",
+                                    "data": {
+                                        "type": "non_taxable_reimbursement",
+                                        "label": "Non-Taxable Reimbursement",
+                                        "is_taxable": false,
+                                        "is_insurable": false,
+                                        "is_pensionable": false,
+                                        "t4_code": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": null
+                                    }
+                                },
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/business_entity_reimbursements/<id>"
+                            }
+                        }
+                    }
+                }
+            },
+            "BusinessEntityReimbursementUpdate": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BusinessEntityReimbursement"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "business_entity_reimbursement",
+                            "data": {
+                                "business_entity": {
+                                    "id": "<id>",
+                                    "object": "business_entity",
+                                    "links": {
+                                        "self": "/business_entities/<id>"
+                                    }
+                                },
+                                "title": null,
+                                "reimbursement_type": {
+                                    "id": "<id>",
+                                    "object": "reimbursement_type",
+                                    "data": {
+                                        "type": "non_taxable_reimbursement",
+                                        "label": "Non-Taxable Reimbursement",
+                                        "is_taxable": false,
+                                        "is_insurable": false,
+                                        "is_pensionable": false,
+                                        "t4_code": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": null
+                                    }
+                                },
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/business_entity_reimbursements/<id>"
                             }
                         }
                     }
@@ -14356,7 +17269,7 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "business_entity_verification",
                             "data": {
                                 "type": "auto",
@@ -14375,10 +17288,10 @@
                                 "verified_industry_codes": null,
                                 "verified_alternative_names": null,
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "incorporation_document_file": null,
@@ -14416,7 +17329,7 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "business_entity_verification",
                             "data": {
                                 "type": "auto",
@@ -14435,14 +17348,14 @@
                                 "verified_industry_codes": null,
                                 "verified_alternative_names": null,
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "incorporation_document_file": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "file",
                                     "links": {
                                         "self": null
@@ -14554,7 +17467,7 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "company",
                             "data": {
                                 "name": "Elite Media Solutions",
@@ -14564,7 +17477,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/companies/<ulid>"
+                                "self": "/companies/<id>"
                             }
                         }
                     }
@@ -14594,7 +17507,7 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "company",
                             "data": {
                                 "name": "Elite Media Solutions",
@@ -14609,7 +17522,7 @@
                                 }
                             },
                             "links": {
-                                "self": "/companies/<ulid>"
+                                "self": "/companies/<id>"
                             }
                         }
                     }
@@ -14716,7 +17629,7 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "contractor",
                                     "data": {
                                         "business_name": "Contractor Co",
@@ -14730,7 +17643,7 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/contractors/<ulid>"
+                                        "self": "/contractors/<id>"
                                     }
                                 }
                             ],
@@ -14820,7 +17733,7 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "contractor",
                             "data": {
                                 "business_name": "Contractor Co",
@@ -14834,7 +17747,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/contractors/<ulid>"
+                                "self": "/contractors/<id>"
                             }
                         }
                     }
@@ -14864,7 +17777,7 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "contractor",
                             "data": {
                                 "business_name": "Contractor Co",
@@ -14878,7 +17791,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/contractors/<ulid>"
+                                "self": "/contractors/<id>"
                             }
                         }
                     }
@@ -14908,7 +17821,7 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "contractor",
                             "data": {
                                 "business_name": "Contractor Co",
@@ -14922,7 +17835,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/contractors/<ulid>"
+                                "self": "/contractors/<id>"
                             }
                         }
                     }
@@ -15016,6 +17929,48 @@
                                                         }
                                                     }
                                                 }
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "remittance_account": {
+                                                        "type": "object",
+                                                        "nullable": true,
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "ulid"
+                                                            },
+                                                            "object": {
+                                                                "type": "string"
+                                                            },
+                                                            "data": {
+                                                                "$ref": "#/components/schemas/RemittanceAccount"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "business_entity_deduction": {
+                                                        "type": "object",
+                                                        "nullable": true,
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "ulid"
+                                                            },
+                                                            "object": {
+                                                                "type": "string"
+                                                            },
+                                                            "data": {
+                                                                "$ref": "#/components/schemas/BusinessEntityDeduction"
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
@@ -15026,19 +17981,19 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "deduction",
                                     "data": {
                                         "employee": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "employee",
                                             "links": {
-                                                "self": "/employees/<ulid>"
+                                                "self": "/employees/<id>"
                                             }
                                         },
                                         "work_assignment": null,
                                         "deduction_type": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "deduction_type",
                                             "data": {
                                                 "type": "income_tax",
@@ -15058,17 +18013,19 @@
                                         "effective_from": "2023-06-01",
                                         "effective_to": null,
                                         "title": null,
+                                        "remittance_account": null,
+                                        "business_entity_deduction": null,
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/deductions/<ulid>"
+                                        "self": "/deductions/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/deductions?employee_id=<ulid>&page=1",
-                                "last": "/deductions?employee_id=<ulid>&page=1",
+                                "first": "/deductions?employee_id=<id>&page=1",
+                                "last": "/deductions?employee_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -15143,25 +18100,67 @@
                                                     }
                                                 }
                                             }
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "remittance_account": {
+                                                    "type": "object",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "ulid"
+                                                        },
+                                                        "object": {
+                                                            "type": "string"
+                                                        },
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/RemittanceAccount"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "business_entity_deduction": {
+                                                    "type": "object",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "ulid"
+                                                        },
+                                                        "object": {
+                                                            "type": "string"
+                                                        },
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/BusinessEntityDeduction"
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
                                     ]
                                 }
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "deduction",
                             "data": {
                                 "employee": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "employee",
                                     "links": {
-                                        "self": "/employees/<ulid>"
+                                        "self": "/employees/<id>"
                                     }
                                 },
                                 "work_assignment": null,
                                 "deduction_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "deduction_type",
                                     "data": {
                                         "type": "income_tax",
@@ -15181,11 +18180,13 @@
                                 "effective_from": "2023-06-01",
                                 "effective_to": null,
                                 "title": null,
+                                "remittance_account": null,
+                                "business_entity_deduction": null,
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/deductions/<ulid>"
+                                "self": "/deductions/<id>"
                             }
                         }
                     }
@@ -15215,19 +18216,19 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "deduction",
                             "data": {
                                 "employee": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "employee",
                                     "links": {
-                                        "self": "/employees/<ulid>"
+                                        "self": "/employees/<id>"
                                     }
                                 },
                                 "work_assignment": null,
                                 "deduction_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "deduction_type",
                                     "data": {
                                         "type": "income_tax",
@@ -15247,11 +18248,13 @@
                                 "effective_from": "2023-06-01",
                                 "effective_to": null,
                                 "title": null,
+                                "remittance_account": null,
+                                "business_entity_deduction": null,
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/deductions/<ulid>"
+                                "self": "/deductions/<id>"
                             }
                         }
                     }
@@ -15281,19 +18284,19 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "deduction",
                             "data": {
                                 "employee": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "employee",
                                     "links": {
-                                        "self": "/employees/<ulid>"
+                                        "self": "/employees/<id>"
                                     }
                                 },
                                 "work_assignment": null,
                                 "deduction_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "deduction_type",
                                     "data": {
                                         "type": "income_tax",
@@ -15313,11 +18316,13 @@
                                 "effective_from": "2023-06-01",
                                 "effective_to": null,
                                 "title": null,
+                                "remittance_account": null,
+                                "business_entity_deduction": null,
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/deductions/<ulid>"
+                                "self": "/deductions/<id>"
                             }
                         }
                     }
@@ -15411,6 +18416,27 @@
                                                         }
                                                     }
                                                 }
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "remittance_account": {
+                                                        "type": "object",
+                                                        "nullable": true,
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "ulid"
+                                                            },
+                                                            "object": {
+                                                                "type": "string"
+                                                            },
+                                                            "data": {
+                                                                "$ref": "#/components/schemas/RemittanceAccount"
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
@@ -15421,14 +18447,14 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "deduction_line_item",
                                     "data": {
                                         "pay_stub": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_stub",
                                             "links": {
-                                                "self": "/pay_stubs/<ulid>"
+                                                "self": "/pay_stubs/<id>"
                                             }
                                         },
                                         "line_item_type": "deduction",
@@ -15436,7 +18462,7 @@
                                         "amount": 35,
                                         "amount_override": null,
                                         "deduction_type": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "deduction_type",
                                             "data": {
                                                 "type": "income_tax",
@@ -15454,17 +18480,18 @@
                                         },
                                         "recurrence": null,
                                         "title": null,
+                                        "remittance_account": null,
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/deduction_line_items/<ulid>"
+                                        "self": "/deduction_line_items/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/deduction_line_items?pay_stub_id=<ulid>&page=1",
-                                "last": "/deduction_line_items?pay_stub_id=<ulid>&page=1",
+                                "first": "/deduction_line_items?pay_stub_id=<id>&page=1",
+                                "last": "/deduction_line_items?pay_stub_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -15539,20 +18566,41 @@
                                                     }
                                                 }
                                             }
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "remittance_account": {
+                                                    "type": "object",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "ulid"
+                                                        },
+                                                        "object": {
+                                                            "type": "string"
+                                                        },
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/RemittanceAccount"
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
                                     ]
                                 }
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "deduction_line_item",
                             "data": {
                                 "pay_stub": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_stub",
                                     "links": {
-                                        "self": "/pay_stubs/<ulid>"
+                                        "self": "/pay_stubs/<id>"
                                     }
                                 },
                                 "line_item_type": "deduction",
@@ -15560,7 +18608,7 @@
                                 "amount": 35,
                                 "amount_override": null,
                                 "deduction_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "deduction_type",
                                     "data": {
                                         "type": "income_tax",
@@ -15578,11 +18626,12 @@
                                 },
                                 "recurrence": null,
                                 "title": null,
+                                "remittance_account": null,
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/deduction_line_items/<ulid>"
+                                "self": "/deduction_line_items/<id>"
                             }
                         }
                     }
@@ -15612,14 +18661,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "deduction_line_item",
                             "data": {
                                 "pay_stub": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_stub",
                                     "links": {
-                                        "self": "/pay_stubs/<ulid>"
+                                        "self": "/pay_stubs/<id>"
                                     }
                                 },
                                 "line_item_type": "deduction",
@@ -15627,7 +18676,7 @@
                                 "amount": 35,
                                 "amount_override": null,
                                 "deduction_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "deduction_type",
                                     "data": {
                                         "type": "income_tax",
@@ -15645,11 +18694,12 @@
                                 },
                                 "recurrence": null,
                                 "title": null,
+                                "remittance_account": null,
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/deduction_line_items/<ulid>"
+                                "self": "/deduction_line_items/<id>"
                             }
                         }
                     }
@@ -15679,14 +18729,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "deduction_line_item",
                             "data": {
                                 "pay_stub": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_stub",
                                     "links": {
-                                        "self": "/pay_stubs/<ulid>"
+                                        "self": "/pay_stubs/<id>"
                                     }
                                 },
                                 "line_item_type": "deduction",
@@ -15694,7 +18744,7 @@
                                 "amount": 35,
                                 "amount_override": null,
                                 "deduction_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "deduction_type",
                                     "data": {
                                         "type": "income_tax",
@@ -15712,11 +18762,12 @@
                                 },
                                 "recurrence": null,
                                 "title": null,
+                                "remittance_account": null,
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/deduction_line_items/<ulid>"
+                                "self": "/deduction_line_items/<id>"
                             }
                         }
                     }
@@ -15752,7 +18803,7 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "deduction_type",
                                     "data": {
                                         "type": "income_tax",
@@ -15769,7 +18820,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "deduction_type",
                                     "data": {
                                         "type": "union_dues",
@@ -15786,11 +18837,45 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "deduction_type",
                                     "data": {
                                         "type": "union_dues_post_tax",
                                         "label": "Union Dues Post Tax",
+                                        "is_taxable": null,
+                                        "is_insurable": null,
+                                        "is_pensionable": null,
+                                        "t4_code": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": null
+                                    }
+                                },
+                                {
+                                    "id": "<id>",
+                                    "object": "deduction_type",
+                                    "data": {
+                                        "type": "garnishment_order",
+                                        "label": "Garnishment Order",
+                                        "is_taxable": null,
+                                        "is_insurable": null,
+                                        "is_pensionable": null,
+                                        "t4_code": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": null
+                                    }
+                                },
+                                {
+                                    "id": "<id>",
+                                    "object": "deduction_type",
+                                    "data": {
+                                        "type": "other_deduction",
+                                        "label": "Other Deduction",
                                         "is_taxable": null,
                                         "is_insurable": null,
                                         "is_pensionable": null,
@@ -15813,7 +18898,7 @@
                                 "current_page": 1,
                                 "last_page": 1,
                                 "per_page": 15,
-                                "total": 3,
+                                "total": 5,
                                 "has_more": false
                             }
                         }
@@ -15908,6 +18993,27 @@
                                                         }
                                                     }
                                                 }
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "overtime_rate": {
+                                                        "type": "object",
+                                                        "nullable": true,
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "ulid"
+                                                            },
+                                                            "object": {
+                                                                "type": "string"
+                                                            },
+                                                            "data": {
+                                                                "$ref": "#/components/schemas/OvertimeRate"
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
@@ -15918,14 +19024,14 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_line_item",
                                     "data": {
                                         "pay_stub": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_stub",
                                             "links": {
-                                                "self": "/pay_stubs/<ulid>"
+                                                "self": "/pay_stubs/<id>"
                                             }
                                         },
                                         "amount": 3000,
@@ -15933,11 +19039,16 @@
                                         "amount_override": null,
                                         "line_item_type": "earning",
                                         "earning_type": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "earning_type",
                                             "data": {
                                                 "type": "wage",
                                                 "label": "Wage",
+                                                "supported_payroll_types": {
+                                                    "regular": true,
+                                                    "historical": true,
+                                                    "off_cycle": false
+                                                },
                                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                                             },
@@ -15948,18 +19059,19 @@
                                         "hours": 0,
                                         "accrued_vacation_pay": 0,
                                         "recurrence": null,
+                                        "overtime_rate": null,
                                         "title": null,
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/earning_line_items/<ulid>"
+                                        "self": "/earning_line_items/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/earning_line_items?pay_stub_id=<ulid>&page=1",
-                                "last": "/earning_line_items?pay_stub_id=<ulid>&page=1",
+                                "first": "/earning_line_items?pay_stub_id=<id>&page=1",
+                                "last": "/earning_line_items?pay_stub_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -16034,20 +19146,41 @@
                                                     }
                                                 }
                                             }
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "overtime_rate": {
+                                                    "type": "object",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "ulid"
+                                                        },
+                                                        "object": {
+                                                            "type": "string"
+                                                        },
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/OvertimeRate"
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
                                     ]
                                 }
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "earning_line_item",
                             "data": {
                                 "pay_stub": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_stub",
                                     "links": {
-                                        "self": "/pay_stubs/<ulid>"
+                                        "self": "/pay_stubs/<id>"
                                     }
                                 },
                                 "amount": 3000,
@@ -16055,11 +19188,16 @@
                                 "amount_override": null,
                                 "line_item_type": "earning",
                                 "earning_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
                                         "type": "wage",
                                         "label": "Wage",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": false
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16070,12 +19208,13 @@
                                 "hours": 0,
                                 "accrued_vacation_pay": 0,
                                 "recurrence": null,
+                                "overtime_rate": null,
                                 "title": null,
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/earning_line_items/<ulid>"
+                                "self": "/earning_line_items/<id>"
                             }
                         }
                     }
@@ -16105,14 +19244,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "earning_line_item",
                             "data": {
                                 "pay_stub": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_stub",
                                     "links": {
-                                        "self": "/pay_stubs/<ulid>"
+                                        "self": "/pay_stubs/<id>"
                                     }
                                 },
                                 "amount": 3000,
@@ -16120,11 +19259,16 @@
                                 "amount_override": null,
                                 "line_item_type": "earning",
                                 "earning_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
                                         "type": "wage",
                                         "label": "Wage",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": false
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16135,12 +19279,13 @@
                                 "hours": 0,
                                 "accrued_vacation_pay": 0,
                                 "recurrence": null,
-                                "title": null,
+                                "overtime_rate": null,
+                                "title": "Earning",
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/earning_line_items/<ulid>"
+                                "self": "/earning_line_items/<id>"
                             }
                         }
                     }
@@ -16170,14 +19315,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "earning_line_item",
                             "data": {
                                 "pay_stub": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_stub",
                                     "links": {
-                                        "self": "/pay_stubs/<ulid>"
+                                        "self": "/pay_stubs/<id>"
                                     }
                                 },
                                 "amount": 3000,
@@ -16185,11 +19330,16 @@
                                 "amount_override": null,
                                 "line_item_type": "earning",
                                 "earning_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
                                         "type": "wage",
                                         "label": "Wage",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": false
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16200,12 +19350,13 @@
                                 "hours": 0,
                                 "accrued_vacation_pay": 0,
                                 "recurrence": null,
-                                "title": null,
+                                "overtime_rate": null,
+                                "title": "Earning",
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/earning_line_items/<ulid>"
+                                "self": "/earning_line_items/<id>"
                             }
                         }
                     }
@@ -16241,11 +19392,16 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
                                         "type": "salary",
                                         "label": "Salary",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": false
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16254,11 +19410,16 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
                                         "type": "wage",
                                         "label": "Wage",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": false
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16267,11 +19428,16 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
                                         "type": "overtime",
                                         "label": "Overtime",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": true
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16280,11 +19446,16 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
-                                        "type": "retroactive_payment",
-                                        "label": "Retroactive Payment",
+                                        "type": "retroactive_pay_increase",
+                                        "label": "Retroactive Pay Increase",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": true
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16293,11 +19464,16 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
                                         "type": "commission",
                                         "label": "Commission",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": true
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16306,11 +19482,16 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
                                         "type": "in_lieu_wages",
                                         "label": "In Lieu Wages (Dismissal Pay)",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": true
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16319,11 +19500,16 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
                                         "type": "bonus_discretionary",
                                         "label": "Bonus (Discretionary)",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": true
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16332,11 +19518,16 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
                                         "type": "bonus_non_discretionary",
                                         "label": "Bonus (Non-Discretionary)",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": true
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16345,11 +19536,16 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
                                         "type": "vacation_pay",
                                         "label": "Vacation Pay",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": true
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16358,11 +19554,16 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
                                         "type": "gratuity",
                                         "label": "Gratuity",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": true
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16371,11 +19572,16 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
                                         "type": "pension",
                                         "label": "Pension",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": true
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16384,11 +19590,16 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
                                         "type": "retiring_allowance",
                                         "label": "Retiring Allowance",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": true
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16397,11 +19608,16 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
                                         "type": "severance_pay",
                                         "label": "Severance Pay",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": true
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16410,11 +19626,16 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
                                         "type": "death_benefit",
                                         "label": "Death Benefit",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": true
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16423,11 +19644,16 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "earning_type",
                                     "data": {
-                                        "type": "lump_sum",
-                                        "label": "Lump sum",
+                                        "type": "invoice_payment",
+                                        "label": "Invoice Payment",
+                                        "supported_payroll_types": {
+                                            "regular": true,
+                                            "historical": true,
+                                            "off_cycle": true
+                                        },
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
@@ -16446,7 +19672,7 @@
                                 "current_page": 1,
                                 "last_page": 2,
                                 "per_page": 15,
-                                "total": 16,
+                                "total": 17,
                                 "has_more": true
                             }
                         }
@@ -16630,14 +19856,14 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "employee",
                                     "data": {
                                         "company": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "company",
                                             "links": {
-                                                "self": "/companies/<ulid>"
+                                                "self": "/companies/<id>"
                                             }
                                         },
                                         "employee_number": "001",
@@ -16653,8 +19879,8 @@
                                         "country_code": "CA",
                                         "postal_code": "M1M1M1",
                                         "sin": "196710156",
+                                        "sin_last_3": "156",
                                         "date_of_birth": "1985-01-20",
-                                        "onboarding_status": "complete",
                                         "warnings": {
                                             "object": "list",
                                             "data": []
@@ -16666,7 +19892,7 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/employees/<ulid>"
+                                        "self": "/employees/<id>"
                                     }
                                 }
                             ],
@@ -16780,14 +20006,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "employee",
                             "data": {
                                 "company": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "company",
                                     "links": {
-                                        "self": "/companies/<ulid>"
+                                        "self": "/companies/<id>"
                                     }
                                 },
                                 "employee_number": "001",
@@ -16803,8 +20029,8 @@
                                 "country_code": "CA",
                                 "postal_code": "M1M1M1",
                                 "sin": "196710156",
+                                "sin_last_3": "156",
                                 "date_of_birth": "1985-01-20",
-                                "onboarding_status": "complete",
                                 "warnings": {
                                     "object": "list",
                                     "data": []
@@ -16816,7 +20042,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/employees/<ulid>"
+                                "self": "/employees/<id>"
                             }
                         }
                     }
@@ -16846,14 +20072,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "employee",
                             "data": {
                                 "company": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "company",
                                     "links": {
-                                        "self": "/companies/<ulid>"
+                                        "self": "/companies/<id>"
                                     }
                                 },
                                 "employee_number": "001",
@@ -16869,8 +20095,8 @@
                                 "country_code": "CA",
                                 "postal_code": "M1M1M1",
                                 "sin": "196710156",
+                                "sin_last_3": "156",
                                 "date_of_birth": "1985-01-20",
-                                "onboarding_status": "complete",
                                 "warnings": {
                                     "object": "list",
                                     "data": []
@@ -16882,7 +20108,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/employees/<ulid>"
+                                "self": "/employees/<id>"
                             }
                         }
                     }
@@ -16912,14 +20138,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "employee",
                             "data": {
                                 "company": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "company",
                                     "links": {
-                                        "self": "/companies/<ulid>"
+                                        "self": "/companies/<id>"
                                     }
                                 },
                                 "employee_number": "001",
@@ -16935,8 +20161,8 @@
                                 "country_code": "CA",
                                 "postal_code": "M1M1M1",
                                 "sin": "196710156",
+                                "sin_last_3": "156",
                                 "date_of_birth": "1985-01-20",
-                                "onboarding_status": "complete",
                                 "warnings": {
                                     "object": "list",
                                     "data": []
@@ -16948,7 +20174,183 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/employees/<ulid>"
+                                "self": "/employees/<id>"
+                            }
+                        }
+                    }
+                }
+            },
+            "EmployerStatutoryWithholdingLineItemIndex": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/EmployerStatutoryWithholdingLineItem"
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "pay_stub": {
+                                                        "type": "object",
+                                                        "nullable": true,
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "ulid"
+                                                            },
+                                                            "object": {
+                                                                "type": "string"
+                                                            },
+                                                            "data": {
+                                                                "$ref": "#/components/schemas/PayStub"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "example": {
+                            "object": "list",
+                            "data": [
+                                {
+                                    "id": "<id>",
+                                    "object": "employer_statutory_withholding_line_item",
+                                    "data": {
+                                        "pay_stub": {
+                                            "id": "<id>",
+                                            "object": "pay_stub",
+                                            "links": {
+                                                "self": "/pay_stubs/<id>"
+                                            }
+                                        },
+                                        "line_item_type": "employer_statutory_withholding",
+                                        "is_managed": true,
+                                        "amount": 1235.11,
+                                        "amount_override": null,
+                                        "employer_statutory_withholding_type": {
+                                            "id": "<id>",
+                                            "object": "employer_statutory_withholding_type",
+                                            "data": {
+                                                "type": "ei",
+                                                "label": "EI",
+                                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                                            },
+                                            "links": {
+                                                "self": null
+                                            }
+                                        },
+                                        "title": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": "/employer_statutory_withholding_line_items/<id>"
+                                    }
+                                },
+                                {
+                                    "id": "<id>",
+                                    "object": "employer_statutory_withholding_line_item",
+                                    "data": {
+                                        "pay_stub": {
+                                            "id": "<id>",
+                                            "object": "pay_stub",
+                                            "links": {
+                                                "self": "/pay_stubs/<id>"
+                                            }
+                                        },
+                                        "line_item_type": "employer_statutory_withholding",
+                                        "is_managed": true,
+                                        "amount": 2101.43,
+                                        "amount_override": null,
+                                        "employer_statutory_withholding_type": {
+                                            "id": "<id>",
+                                            "object": "employer_statutory_withholding_type",
+                                            "data": {
+                                                "type": "cpp",
+                                                "label": "CPP",
+                                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                                            },
+                                            "links": {
+                                                "self": null
+                                            }
+                                        },
+                                        "title": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": "/employer_statutory_withholding_line_items/<id>"
+                                    }
+                                },
+                                {
+                                    "id": "<id>",
+                                    "object": "employer_statutory_withholding_line_item",
+                                    "data": {
+                                        "pay_stub": {
+                                            "id": "<id>",
+                                            "object": "pay_stub",
+                                            "links": {
+                                                "self": "/pay_stubs/<id>"
+                                            }
+                                        },
+                                        "line_item_type": "employer_statutory_withholding",
+                                        "is_managed": true,
+                                        "amount": 355.22,
+                                        "amount_override": null,
+                                        "employer_statutory_withholding_type": {
+                                            "id": "<id>",
+                                            "object": "employer_statutory_withholding_type",
+                                            "data": {
+                                                "type": "cpp_2",
+                                                "label": "CPP 2",
+                                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                                            },
+                                            "links": {
+                                                "self": null
+                                            }
+                                        },
+                                        "title": null,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": "/employer_statutory_withholding_line_items/<id>"
+                                    }
+                                }
+                            ],
+                            "links": {
+                                "first": "/employer_statutory_withholding_line_items?pay_stub_id=<id>&page=1",
+                                "last": "/employer_statutory_withholding_line_items?pay_stub_id=<id>&page=1",
+                                "prev": null,
+                                "next": null
+                            },
+                            "meta": {
+                                "current_page": 1,
+                                "last_page": 1,
+                                "per_page": 15,
+                                "total": 3,
+                                "has_more": false
                             }
                         }
                     }
@@ -17031,14 +20433,14 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "form",
                                     "data": {
                                         "work_assignment": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "work_assignment",
                                             "links": {
-                                                "self": "/work_assignments/<ulid>"
+                                                "self": "/work_assignments/<id>"
                                             }
                                         },
                                         "type": "td1",
@@ -17067,13 +20469,13 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/forms/<ulid>"
+                                        "self": "/forms/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/forms?work_assignment_id=<ulid>&page=1",
-                                "last": "/forms?work_assignment_id=<ulid>&page=1",
+                                "first": "/forms?work_assignment_id=<id>&page=1",
+                                "last": "/forms?work_assignment_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -17133,14 +20535,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "form",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
                                 "type": "td1",
@@ -17169,7 +20571,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/forms/<ulid>"
+                                "self": "/forms/<id>"
                             }
                         }
                     }
@@ -17199,14 +20601,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "form",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
                                 "type": "td1",
@@ -17235,7 +20637,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/forms/<ulid>"
+                                "self": "/forms/<id>"
                             }
                         }
                     }
@@ -17265,21 +20667,21 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "form",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
                                 "type": "td1",
                                 "effective_date": "2023-01-01T00:00:00.000000Z",
                                 "version_year": "2023",
                                 "version_month": "january",
-                                "line_1_basic_personal_amount": "1",
+                                "line_1_basic_personal_amount": 1500,
                                 "line_2_infirm_children_caregiver_amount": null,
                                 "line_3_age_amount": null,
                                 "line_4_pension_income_amount": null,
@@ -17301,7 +20703,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/forms/<ulid>"
+                                "self": "/forms/<id>"
                             }
                         }
                     }
@@ -17337,168 +20739,168 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "form_type",
                                     "data": {
-                                        "type": "<ulid>",
+                                        "type": "td1",
                                         "label": "TD1 Personal Tax Credits Return"
                                     },
                                     "links": {
-                                        "self": "/form_types/<ulid>"
+                                        "self": "/form_types/td1"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "form_type",
                                     "data": {
-                                        "type": "<ulid>ab",
+                                        "type": "td1ab",
                                         "label": "TD1AB Alberta Personal Tax Credits Return"
                                     },
                                     "links": {
-                                        "self": "/form_types/<ulid>ab"
+                                        "self": "/form_types/td1ab"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "form_type",
                                     "data": {
-                                        "type": "<ulid>bc",
+                                        "type": "td1bc",
                                         "label": "TD1BC British Columbia Personal Tax Credits Return"
                                     },
                                     "links": {
-                                        "self": "/form_types/<ulid>bc"
+                                        "self": "/form_types/td1bc"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "form_type",
                                     "data": {
-                                        "type": "<ulid>mb",
+                                        "type": "td1mb",
                                         "label": "TD1MB Manitoba Personal Tax Credits Return"
                                     },
                                     "links": {
-                                        "self": "/form_types/<ulid>mb"
+                                        "self": "/form_types/td1mb"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "form_type",
                                     "data": {
-                                        "type": "<ulid>nb",
+                                        "type": "td1nb",
                                         "label": "TD1NB New Brunswick Personal Tax Credits Return"
                                     },
                                     "links": {
-                                        "self": "/form_types/<ulid>nb"
+                                        "self": "/form_types/td1nb"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "form_type",
                                     "data": {
-                                        "type": "<ulid>nl",
+                                        "type": "td1nl",
                                         "label": "TD1NL Newfoundland and Labrador Personal Tax Credits Return"
                                     },
                                     "links": {
-                                        "self": "/form_types/<ulid>nl"
+                                        "self": "/form_types/td1nl"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "form_type",
                                     "data": {
-                                        "type": "<ulid>ns",
+                                        "type": "td1ns",
                                         "label": "TD1NS Nova Scotia Personal Tax Credits Return"
                                     },
                                     "links": {
-                                        "self": "/form_types/<ulid>ns"
+                                        "self": "/form_types/td1ns"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "form_type",
                                     "data": {
-                                        "type": "<ulid>nt",
+                                        "type": "td1nt",
                                         "label": "TD1NT Northwest Territories Personal Tax Credits Return"
                                     },
                                     "links": {
-                                        "self": "/form_types/<ulid>nt"
+                                        "self": "/form_types/td1nt"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "form_type",
                                     "data": {
-                                        "type": "<ulid>nu",
+                                        "type": "td1nu",
                                         "label": "TD1NU Nunavut Personal Tax Credits Return"
                                     },
                                     "links": {
-                                        "self": "/form_types/<ulid>nu"
+                                        "self": "/form_types/td1nu"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "form_type",
                                     "data": {
-                                        "type": "<ulid>on",
+                                        "type": "td1on",
                                         "label": "TD1ON Ontario Personal Tax Credits Return"
                                     },
                                     "links": {
-                                        "self": "/form_types/<ulid>on"
+                                        "self": "/form_types/td1on"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "form_type",
                                     "data": {
-                                        "type": "<ulid>pe",
+                                        "type": "td1pe",
                                         "label": "TD1PE Prince Edward Island Personal Tax Credits Return"
                                     },
                                     "links": {
-                                        "self": "/form_types/<ulid>pe"
+                                        "self": "/form_types/td1pe"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "form_type",
                                     "data": {
-                                        "type": "<ulid>sk",
+                                        "type": "td1sk",
                                         "label": "TD1SK Saskatchewan Personal Tax Credits Return"
                                     },
                                     "links": {
-                                        "self": "/form_types/<ulid>sk"
+                                        "self": "/form_types/td1sk"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "form_type",
                                     "data": {
-                                        "type": "<ulid>yt",
+                                        "type": "td1yt",
                                         "label": "TD1YT Yukon Personal Tax Credits Return"
                                     },
                                     "links": {
-                                        "self": "/form_types/<ulid>yt"
+                                        "self": "/form_types/td1yt"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "form_type",
                                     "data": {
-                                        "type": "<ulid>",
+                                        "type": "tp_1015_3_v",
                                         "label": "Qu\u00e9bec Source Deductions Return"
                                     },
                                     "links": {
-                                        "self": "/form_types/<ulid>"
+                                        "self": "/form_types/tp_1015_3_v"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "form_type",
                                     "data": {
-                                        "type": "<ulid>x",
+                                        "type": "td1x",
                                         "label": "TD1X Statement of Commission Income and Expenses"
                                     },
                                     "links": {
-                                        "self": "/form_types/<ulid>x"
+                                        "self": "/form_types/td1x"
                                     }
                                 }
                             ]
@@ -17530,10 +20932,10 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "form_type",
                             "data": {
-                                "type": "<ulid>",
+                                "type": "td1",
                                 "label": "TD1 Personal Tax Credits Return",
                                 "version_year": 2023,
                                 "version_month": "january",
@@ -17721,7 +21123,7 @@
                                 ]
                             },
                             "links": {
-                                "self": "/form_types/<ulid>"
+                                "self": "/form_types/td1"
                             }
                         }
                     }
@@ -17804,14 +21206,14 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "gl_code",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "label": "Accounts Receivable",
@@ -17820,13 +21222,13 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/gl_codes/<ulid>"
+                                        "self": "/gl_codes/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/gl_codes?business_entity_id=<ulid>&page=1",
-                                "last": "/gl_codes?business_entity_id=<ulid>&page=1",
+                                "first": "/gl_codes?business_entity_id=<id>&page=1",
+                                "last": "/gl_codes?business_entity_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -17886,14 +21288,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "gl_code",
                             "data": {
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "label": "Accounts Receivable",
@@ -17902,7 +21304,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/gl_codes/<ulid>"
+                                "self": "/gl_codes/<id>"
                             }
                         }
                     }
@@ -17932,14 +21334,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "gl_code",
                             "data": {
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "label": "Accounts Receivable",
@@ -17948,7 +21350,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/gl_codes/<ulid>"
+                                "self": "/gl_codes/<id>"
                             }
                         }
                     }
@@ -17978,14 +21380,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "gl_code",
                             "data": {
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "label": "Accounts Receivable",
@@ -17994,7 +21396,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/gl_codes/<ulid>"
+                                "self": "/gl_codes/<id>"
                             }
                         }
                     }
@@ -18024,16 +21426,16 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "report",
                             "data": {
                                 "type": "liability",
                                 "business_entity": null,
                                 "pay_schedule": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_schedule",
                                     "links": {
-                                        "self": "/pay_schedules/<ulid>"
+                                        "self": "/pay_schedules/<id>"
                                     }
                                 },
                                 "payroll": null,
@@ -18055,7 +21457,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/reports/<ulid>"
+                                "self": "/reports/<id>"
                             }
                         }
                     }
@@ -18175,6 +21577,27 @@
                                                         }
                                                     }
                                                 }
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "overtime_rate": {
+                                                        "type": "object",
+                                                        "nullable": true,
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "ulid"
+                                                            },
+                                                            "object": {
+                                                                "type": "string"
+                                                            },
+                                                            "data": {
+                                                                "$ref": "#/components/schemas/OvertimeRate"
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
@@ -18185,14 +21608,14 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
-                                    "object": "line_item",
+                                    "id": "<id>",
+                                    "object": "earning_line_item",
                                     "data": {
                                         "pay_stub": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_stub",
                                             "links": {
-                                                "self": "/pay_stubs/<ulid>"
+                                                "self": "/pay_stubs/<id>"
                                             }
                                         },
                                         "amount": 3000,
@@ -18200,11 +21623,16 @@
                                         "amount_override": null,
                                         "line_item_type": "earning",
                                         "earning_type": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "earning_type",
                                             "data": {
                                                 "type": "wage",
                                                 "label": "Wage",
+                                                "supported_payroll_types": {
+                                                    "regular": true,
+                                                    "historical": true,
+                                                    "off_cycle": false
+                                                },
                                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                                             },
@@ -18215,6 +21643,7 @@
                                         "hours": 0,
                                         "accrued_vacation_pay": 0,
                                         "recurrence": null,
+                                        "overtime_rate": null,
                                         "title": null,
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
@@ -18224,21 +21653,23 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
-                                    "object": "line_item",
+                                    "id": "<id>",
+                                    "object": "statutory_withholding_line_item",
                                     "data": {
                                         "pay_stub": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_stub",
                                             "links": {
-                                                "self": "/pay_stubs/<ulid>"
+                                                "self": "/pay_stubs/<id>"
                                             }
                                         },
                                         "line_item_type": "statutory_withholding",
+                                        "is_system": true,
                                         "is_managed": true,
                                         "amount": 500,
+                                        "amount_override": null,
                                         "statutory_withholding_type": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "statutory_withholding_type",
                                             "data": {
                                                 "type": "federal_income_tax",
@@ -18261,8 +21692,8 @@
                                 }
                             ],
                             "links": {
-                                "first": "/line_items?pay_stub_id=<ulid>&page=1",
-                                "last": "/line_items?pay_stub_id=<ulid>&page=1",
+                                "first": "/line_items?pay_stub_id=<id>&page=1",
+                                "last": "/line_items?pay_stub_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -18272,6 +21703,299 @@
                                 "per_page": 15,
                                 "total": 2,
                                 "has_more": false
+                            }
+                        }
+                    }
+                }
+            },
+            "OvertimeRateDestroy": {
+                "description": "No Content",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/OvertimeRate"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "OvertimeRateIndex": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/OvertimeRate"
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "pay_rate": {
+                                                        "type": "object",
+                                                        "nullable": true,
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "ulid"
+                                                            },
+                                                            "object": {
+                                                                "type": "string"
+                                                            },
+                                                            "data": {
+                                                                "$ref": "#/components/schemas/PayRate"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "example": {
+                            "object": "list",
+                            "data": [
+                                {
+                                    "id": "<id>",
+                                    "object": "overtime_rate",
+                                    "data": {
+                                        "pay_rate": {
+                                            "id": "<id>",
+                                            "object": "pay_rate",
+                                            "links": {
+                                                "self": "/pay_rates/<id>"
+                                            }
+                                        },
+                                        "title": "1.5x",
+                                        "rate_multiplier": 1.5,
+                                        "hourly_rate": 22.5,
+                                        "hourly_rate_override": null,
+                                        "archived_at": null,
+                                        "is_editable": true,
+                                        "is_deletable": true,
+                                        "created_at": "2023-01-01T00:00:00.000000Z",
+                                        "updated_at": "2023-01-01T00:00:00.000000Z"
+                                    },
+                                    "links": {
+                                        "self": "/overtime_rates/<id>"
+                                    }
+                                }
+                            ],
+                            "links": {
+                                "first": "/overtime_rates?pay_rate_id=<id>&page=1",
+                                "last": "/overtime_rates?pay_rate_id=<id>&page=1",
+                                "prev": null,
+                                "next": null
+                            },
+                            "meta": {
+                                "current_page": 1,
+                                "last_page": 1,
+                                "per_page": 15,
+                                "total": 1,
+                                "has_more": false
+                            }
+                        }
+                    }
+                }
+            },
+            "OvertimeRateShow": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/OvertimeRate"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "pay_rate": {
+                                                    "type": "object",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "ulid"
+                                                        },
+                                                        "object": {
+                                                            "type": "string"
+                                                        },
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/PayRate"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "overtime_rate",
+                            "data": {
+                                "pay_rate": {
+                                    "id": "<id>",
+                                    "object": "pay_rate",
+                                    "links": {
+                                        "self": "/pay_rates/<id>"
+                                    }
+                                },
+                                "title": "1.5x",
+                                "rate_multiplier": 1.5,
+                                "hourly_rate": 22.5,
+                                "hourly_rate_override": null,
+                                "archived_at": null,
+                                "is_editable": true,
+                                "is_deletable": true,
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/overtime_rates/<id>"
+                            }
+                        }
+                    }
+                }
+            },
+            "OvertimeRateStore": {
+                "description": "Created",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/OvertimeRate"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "overtime_rate",
+                            "data": {
+                                "pay_rate": {
+                                    "id": "<id>",
+                                    "object": "pay_rate",
+                                    "links": {
+                                        "self": "/pay_rates/<id>"
+                                    }
+                                },
+                                "title": "1.5x",
+                                "rate_multiplier": 1.5,
+                                "hourly_rate": 22.5,
+                                "hourly_rate_override": null,
+                                "archived_at": null,
+                                "is_editable": true,
+                                "is_deletable": true,
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/overtime_rates/<id>"
+                            }
+                        }
+                    }
+                }
+            },
+            "OvertimeRateUpdate": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "ulid"
+                                },
+                                "object": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/OvertimeRate"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "example": {
+                            "id": "<id>",
+                            "object": "overtime_rate",
+                            "data": {
+                                "pay_rate": {
+                                    "id": "<id>",
+                                    "object": "pay_rate",
+                                    "links": {
+                                        "self": "/pay_rates/<id>"
+                                    }
+                                },
+                                "title": "$23",
+                                "rate_multiplier": 1.5,
+                                "hourly_rate": 22.5,
+                                "hourly_rate_override": 23,
+                                "archived_at": null,
+                                "is_editable": true,
+                                "is_deletable": true,
+                                "created_at": "2023-01-01T00:00:00.000000Z",
+                                "updated_at": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "links": {
+                                "self": "/overtime_rates/<id>"
                             }
                         }
                     }
@@ -18301,7 +22025,7 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "partner",
                             "data": {
                                 "name": "prosacco-pro.biz",
@@ -18413,14 +22137,14 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_rate",
                                     "data": {
                                         "work_assignment": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "work_assignment",
                                             "links": {
-                                                "self": "/work_assignments/<ulid>"
+                                                "self": "/work_assignments/<id>"
                                             }
                                         },
                                         "title": "Marketing Manager",
@@ -18438,13 +22162,13 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/pay_rates/<ulid>"
+                                        "self": "/pay_rates/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/pay_rates?employee_id=<ulid>&page=1",
-                                "last": "/pay_rates?employee_id=<ulid>&page=1",
+                                "first": "/pay_rates?employee_id=<id>&page=1",
+                                "last": "/pay_rates?employee_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -18525,14 +22249,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "pay_rate",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
                                 "title": "Marketing Manager",
@@ -18550,7 +22274,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/pay_rates/<ulid>"
+                                "self": "/pay_rates/<id>"
                             }
                         }
                     }
@@ -18580,14 +22304,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "pay_rate",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
                                 "title": "Marketing Manager",
@@ -18605,7 +22329,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/pay_rates/<ulid>"
+                                "self": "/pay_rates/<id>"
                             }
                         }
                     }
@@ -18635,14 +22359,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "pay_rate",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
                                 "title": "Marketing Manager",
@@ -18660,7 +22384,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/pay_rates/<ulid>"
+                                "self": "/pay_rates/<id>"
                             }
                         }
                     }
@@ -18767,14 +22491,14 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_schedule",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "title": "Default Schedule",
@@ -18790,13 +22514,13 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/pay_schedules/<ulid>"
+                                        "self": "/pay_schedules/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/pay_schedules?business_entity_id=<ulid>&page=1",
-                                "last": "/pay_schedules?business_entity_id=<ulid>&page=1",
+                                "first": "/pay_schedules?business_entity_id=<id>&page=1",
+                                "last": "/pay_schedules?business_entity_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -18880,14 +22604,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "pay_schedule",
                             "data": {
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "title": "Default Schedule",
@@ -18903,7 +22627,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/pay_schedules/<ulid>"
+                                "self": "/pay_schedules/<id>"
                             }
                         }
                     }
@@ -18933,14 +22657,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "pay_schedule",
                             "data": {
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "title": "Default Schedule",
@@ -18956,7 +22680,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/pay_schedules/<ulid>"
+                                "self": "/pay_schedules/<id>"
                             }
                         }
                     }
@@ -18986,14 +22710,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "pay_schedule",
                             "data": {
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "title": "Default Schedule",
@@ -19009,7 +22733,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/pay_schedules/<ulid>"
+                                "self": "/pay_schedules/<id>"
                             }
                         }
                     }
@@ -19155,7 +22879,7 @@
                                             {
                                                 "type": "object",
                                                 "properties": {
-                                                    "business_entity_deduction_line_items": {
+                                                    "employer_statutory_withholding_line_items": {
                                                         "type": "object",
                                                         "nullable": true,
                                                         "properties": {
@@ -19169,7 +22893,7 @@
                                                             "data": {
                                                                 "type": "array",
                                                                 "items": {
-                                                                    "$ref": "#/components/schemas/BusinessEntityDeductionLineItem"
+                                                                    "$ref": "#/components/schemas/EmployerStatutoryWithholdingLineItem"
                                                                 }
                                                             }
                                                         }
@@ -19329,32 +23053,35 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_stub",
                                     "data": {
                                         "payroll": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "payroll",
                                             "links": {
-                                                "self": "/payrolls/<ulid>"
+                                                "self": "/payrolls/<id>"
                                             }
                                         },
                                         "work_assignment": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "work_assignment",
                                             "links": {
-                                                "self": "/work_assignments/<ulid>"
+                                                "self": "/work_assignments/<id>"
                                             }
                                         },
+                                        "payment_method": "direct_deposit",
                                         "has_taxes_calculated": true,
                                         "is_pending_tax_rates": false,
                                         "employee_summary": {
                                             "gross": 0,
                                             "deductions": 0,
+                                            "subtractions": 0,
                                             "reimbursements": 0,
                                             "net": 0,
                                             "gross_ytd": 0,
                                             "deductions_ytd": 0,
+                                            "subtractions_ytd": 0,
                                             "reimbursements_ytd": 0,
                                             "net_ytd": 0
                                         },
@@ -19376,11 +23103,12 @@
                                         },
                                         "liability": 0,
                                         "cash_requirement": 0,
-                                        "pay_by_cheque": false,
                                         "note": null,
                                         "line_item_summary": {
                                             "earnings": {
                                                 "period": 0,
+                                                "period_managed": 0,
+                                                "period_unmanaged": 0,
                                                 "ytd": 0
                                             },
                                             "statutory_withholdings": {
@@ -19408,13 +23136,13 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/pay_stubs/<ulid>"
+                                        "self": "/pay_stubs/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/pay_stubs?payroll_id=<ulid>&page=1",
-                                "last": "/pay_stubs?payroll_id=<ulid>&page=1",
+                                "first": "/pay_stubs?payroll_id=<id>&page=1",
+                                "last": "/pay_stubs?payroll_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -19541,7 +23269,7 @@
                                         {
                                             "type": "object",
                                             "properties": {
-                                                "business_entity_deduction_line_items": {
+                                                "employer_statutory_withholding_line_items": {
                                                     "type": "object",
                                                     "nullable": true,
                                                     "properties": {
@@ -19555,7 +23283,7 @@
                                                         "data": {
                                                             "type": "array",
                                                             "items": {
-                                                                "$ref": "#/components/schemas/BusinessEntityDeductionLineItem"
+                                                                "$ref": "#/components/schemas/EmployerStatutoryWithholdingLineItem"
                                                             }
                                                         }
                                                     }
@@ -19711,32 +23439,35 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "pay_stub",
                             "data": {
                                 "payroll": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 },
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
+                                "payment_method": "direct_deposit",
                                 "has_taxes_calculated": true,
                                 "is_pending_tax_rates": false,
                                 "employee_summary": {
                                     "gross": null,
                                     "deductions": null,
+                                    "subtractions": null,
                                     "reimbursements": null,
                                     "net": null,
                                     "gross_ytd": null,
                                     "deductions_ytd": null,
+                                    "subtractions_ytd": null,
                                     "reimbursements_ytd": null,
                                     "net_ytd": null
                                 },
@@ -19758,11 +23489,12 @@
                                 },
                                 "liability": null,
                                 "cash_requirement": null,
-                                "pay_by_cheque": false,
                                 "note": "A PayStub note",
                                 "line_item_summary": {
                                     "earnings": {
                                         "period": null,
+                                        "period_managed": null,
+                                        "period_unmanaged": null,
                                         "ytd": null
                                     },
                                     "statutory_withholdings": {
@@ -19790,7 +23522,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/pay_stubs/<ulid>"
+                                "self": "/pay_stubs/<id>"
                             }
                         }
                     }
@@ -19820,32 +23552,35 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "pay_stub",
                             "data": {
                                 "payroll": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 },
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
+                                "payment_method": null,
                                 "has_taxes_calculated": true,
                                 "is_pending_tax_rates": null,
                                 "employee_summary": {
                                     "gross": null,
                                     "deductions": null,
+                                    "subtractions": null,
                                     "reimbursements": null,
                                     "net": null,
                                     "gross_ytd": null,
                                     "deductions_ytd": null,
+                                    "subtractions_ytd": null,
                                     "reimbursements_ytd": null,
                                     "net_ytd": null
                                 },
@@ -19867,11 +23602,12 @@
                                 },
                                 "liability": null,
                                 "cash_requirement": null,
-                                "pay_by_cheque": false,
                                 "note": "Off-cycle paystub",
                                 "line_item_summary": {
                                     "earnings": {
                                         "period": null,
+                                        "period_managed": null,
+                                        "period_unmanaged": null,
                                         "ytd": null
                                     },
                                     "statutory_withholdings": {
@@ -19899,7 +23635,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/pay_stubs/<ulid>"
+                                "self": "/pay_stubs/<id>"
                             }
                         }
                     }
@@ -19929,32 +23665,35 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "pay_stub",
                             "data": {
                                 "payroll": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 },
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
+                                "payment_method": "direct_deposit",
                                 "has_taxes_calculated": true,
                                 "is_pending_tax_rates": false,
                                 "employee_summary": {
                                     "gross": null,
                                     "deductions": null,
+                                    "subtractions": null,
                                     "reimbursements": null,
                                     "net": null,
                                     "gross_ytd": null,
                                     "deductions_ytd": null,
+                                    "subtractions_ytd": null,
                                     "reimbursements_ytd": null,
                                     "net_ytd": null
                                 },
@@ -19976,11 +23715,12 @@
                                 },
                                 "liability": null,
                                 "cash_requirement": null,
-                                "pay_by_cheque": false,
                                 "note": null,
                                 "line_item_summary": {
                                     "earnings": {
                                         "period": null,
+                                        "period_managed": null,
+                                        "period_unmanaged": null,
                                         "ytd": null
                                     },
                                     "statutory_withholdings": {
@@ -20008,7 +23748,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/pay_stubs/<ulid>"
+                                "self": "/pay_stubs/<id>"
                             }
                         }
                     }
@@ -20090,25 +23830,31 @@
                                     "object": "pay_stub_import",
                                     "data": {
                                         "employee": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "employee",
                                             "links": {
-                                                "self": "/employees/<ulid>"
+                                                "self": "/employees/<id>"
                                             }
                                         },
                                         "work_assignment": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "work_assignment",
                                             "links": {
-                                                "self": "/work_assignments/<ulid>"
+                                                "self": "/work_assignments/<id>"
                                             }
                                         },
-                                        "regular_earnings": "200.00",
-                                        "vacation_pay": "20.00",
+                                        "wage": "2000.00",
+                                        "salary": "1000.00",
+                                        "unpaid_wage_vacation_pay": "50.55",
+                                        "unpaid_salary_vacation_pay": "22.00",
                                         "federal_income_tax": "22.11",
                                         "provincial_income_tax": "15.50",
                                         "ei": "5.50",
-                                        "cpp": "7.25"
+                                        "cpp": "7.25",
+                                        "cpp2": "0.00",
+                                        "employer_ei": "0.00",
+                                        "employer_cpp": "0.00",
+                                        "employer_cpp2": "0.00"
                                     },
                                     "links": {
                                         "self": null
@@ -20153,25 +23899,31 @@
                                     "object": "pay_stub_import",
                                     "data": {
                                         "employee": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "employee",
                                             "links": {
-                                                "self": "/employees/<ulid>"
+                                                "self": "/employees/<id>"
                                             }
                                         },
                                         "work_assignment": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "work_assignment",
                                             "links": {
-                                                "self": "/work_assignments/<ulid>"
+                                                "self": "/work_assignments/<id>"
                                             }
                                         },
-                                        "regular_earnings": "200.00",
-                                        "vacation_pay": "20.00",
+                                        "wage": "200.00",
+                                        "salary": "0.00",
+                                        "unpaid_wage_vacation_pay": "20.00",
+                                        "unpaid_salary_vacation_pay": "0.00",
                                         "federal_income_tax": "22.11",
                                         "provincial_income_tax": "15.50",
                                         "ei": "5.50",
-                                        "cpp": "7.25"
+                                        "cpp": "7.25",
+                                        "cpp2": "0.00",
+                                        "employer_ei": "0.00",
+                                        "employer_cpp": "0.00",
+                                        "employer_cpp2": "0.00"
                                     },
                                     "links": {
                                         "self": null
@@ -20206,21 +23958,21 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "payroll",
                             "data": {
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "pay_schedule": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_schedule",
                                     "links": {
-                                        "self": "/pay_schedules/<ulid>"
+                                        "self": "/pay_schedules/<id>"
                                     }
                                 },
                                 "type": "regular",
@@ -20229,7 +23981,8 @@
                                 "period_start": "2023-01-07",
                                 "period_end": "2023-01-07",
                                 "pay_date": "2023-01-07",
-                                "debit_date": "2023-01-05",
+                                "debit_date": "2023-01-06",
+                                "approval_due_at": "2023-01-05T21:30:00.000000Z",
                                 "regular_periods_count": null,
                                 "is_impacted_by_weekend_or_holiday": false,
                                 "is_blocked_by_draft": false,
@@ -20237,6 +23990,7 @@
                                 "employee_summary": {
                                     "gross": null,
                                     "deductions": null,
+                                    "subtractions": null,
                                     "reimbursements": null,
                                     "net": null
                                 },
@@ -20258,7 +24012,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/payrolls/<ulid>"
+                                "self": "/payrolls/<id>"
                             }
                         }
                     }
@@ -20386,21 +24140,21 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "pay_schedule": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_schedule",
                                             "links": {
-                                                "self": "/pay_schedules/<ulid>"
+                                                "self": "/pay_schedules/<id>"
                                             }
                                         },
                                         "type": "regular",
@@ -20409,7 +24163,8 @@
                                         "period_start": "2023-01-07",
                                         "period_end": "2023-01-07",
                                         "pay_date": "2023-01-07",
-                                        "debit_date": "2023-01-05",
+                                        "debit_date": "2023-01-06",
+                                        "approval_due_at": "2023-01-05T21:30:00.000000Z",
                                         "regular_periods_count": null,
                                         "is_impacted_by_weekend_or_holiday": false,
                                         "is_blocked_by_draft": false,
@@ -20417,6 +24172,7 @@
                                         "employee_summary": {
                                             "gross": null,
                                             "deductions": null,
+                                            "subtractions": null,
                                             "reimbursements": null,
                                             "net": null
                                         },
@@ -20438,25 +24194,25 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "pay_schedule": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_schedule",
                                             "links": {
-                                                "self": "/pay_schedules/<ulid>"
+                                                "self": "/pay_schedules/<id>"
                                             }
                                         },
                                         "type": "regular",
@@ -20465,7 +24221,8 @@
                                         "period_start": "2023-01-01",
                                         "period_end": "2023-01-31",
                                         "pay_date": "2023-01-31",
-                                        "debit_date": "2023-01-29",
+                                        "debit_date": "2023-01-31",
+                                        "approval_due_at": "2023-01-30T21:30:00.000000Z",
                                         "regular_periods_count": 12,
                                         "is_impacted_by_weekend_or_holiday": false,
                                         "is_blocked_by_draft": true,
@@ -20473,6 +24230,7 @@
                                         "employee_summary": {
                                             "gross": null,
                                             "deductions": null,
+                                            "subtractions": null,
                                             "reimbursements": null,
                                             "net": null
                                         },
@@ -20494,25 +24252,25 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "pay_schedule": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_schedule",
                                             "links": {
-                                                "self": "/pay_schedules/<ulid>"
+                                                "self": "/pay_schedules/<id>"
                                             }
                                         },
                                         "type": "regular",
@@ -20521,7 +24279,8 @@
                                         "period_start": "2023-02-01",
                                         "period_end": "2023-02-28",
                                         "pay_date": "2023-02-28",
-                                        "debit_date": "2023-02-26",
+                                        "debit_date": "2023-02-28",
+                                        "approval_due_at": "2023-02-27T21:30:00.000000Z",
                                         "regular_periods_count": 12,
                                         "is_impacted_by_weekend_or_holiday": false,
                                         "is_blocked_by_draft": true,
@@ -20529,6 +24288,7 @@
                                         "employee_summary": {
                                             "gross": null,
                                             "deductions": null,
+                                            "subtractions": null,
                                             "reimbursements": null,
                                             "net": null
                                         },
@@ -20550,25 +24310,25 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "pay_schedule": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_schedule",
                                             "links": {
-                                                "self": "/pay_schedules/<ulid>"
+                                                "self": "/pay_schedules/<id>"
                                             }
                                         },
                                         "type": "regular",
@@ -20577,7 +24337,8 @@
                                         "period_start": "2023-03-01",
                                         "period_end": "2023-03-31",
                                         "pay_date": "2023-03-31",
-                                        "debit_date": "2023-03-29",
+                                        "debit_date": "2023-03-31",
+                                        "approval_due_at": "2023-03-30T20:30:00.000000Z",
                                         "regular_periods_count": 12,
                                         "is_impacted_by_weekend_or_holiday": false,
                                         "is_blocked_by_draft": true,
@@ -20585,6 +24346,7 @@
                                         "employee_summary": {
                                             "gross": null,
                                             "deductions": null,
+                                            "subtractions": null,
                                             "reimbursements": null,
                                             "net": null
                                         },
@@ -20606,25 +24368,25 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "pay_schedule": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_schedule",
                                             "links": {
-                                                "self": "/pay_schedules/<ulid>"
+                                                "self": "/pay_schedules/<id>"
                                             }
                                         },
                                         "type": "regular",
@@ -20633,7 +24395,8 @@
                                         "period_start": "2023-04-01",
                                         "period_end": "2023-04-30",
                                         "pay_date": "2023-04-28",
-                                        "debit_date": "2023-04-26",
+                                        "debit_date": "2023-04-28",
+                                        "approval_due_at": "2023-04-27T20:30:00.000000Z",
                                         "regular_periods_count": 12,
                                         "is_impacted_by_weekend_or_holiday": true,
                                         "is_blocked_by_draft": true,
@@ -20641,6 +24404,7 @@
                                         "employee_summary": {
                                             "gross": null,
                                             "deductions": null,
+                                            "subtractions": null,
                                             "reimbursements": null,
                                             "net": null
                                         },
@@ -20662,25 +24426,25 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "pay_schedule": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_schedule",
                                             "links": {
-                                                "self": "/pay_schedules/<ulid>"
+                                                "self": "/pay_schedules/<id>"
                                             }
                                         },
                                         "type": "regular",
@@ -20689,7 +24453,8 @@
                                         "period_start": "2023-05-01",
                                         "period_end": "2023-05-31",
                                         "pay_date": "2023-05-31",
-                                        "debit_date": "2023-05-29",
+                                        "debit_date": "2023-05-31",
+                                        "approval_due_at": "2023-05-30T20:30:00.000000Z",
                                         "regular_periods_count": 12,
                                         "is_impacted_by_weekend_or_holiday": false,
                                         "is_blocked_by_draft": true,
@@ -20697,6 +24462,7 @@
                                         "employee_summary": {
                                             "gross": null,
                                             "deductions": null,
+                                            "subtractions": null,
                                             "reimbursements": null,
                                             "net": null
                                         },
@@ -20718,25 +24484,25 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "pay_schedule": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_schedule",
                                             "links": {
-                                                "self": "/pay_schedules/<ulid>"
+                                                "self": "/pay_schedules/<id>"
                                             }
                                         },
                                         "type": "regular",
@@ -20745,7 +24511,8 @@
                                         "period_start": "2023-06-01",
                                         "period_end": "2023-06-30",
                                         "pay_date": "2023-06-30",
-                                        "debit_date": "2023-06-28",
+                                        "debit_date": "2023-06-30",
+                                        "approval_due_at": "2023-06-29T20:30:00.000000Z",
                                         "regular_periods_count": 12,
                                         "is_impacted_by_weekend_or_holiday": false,
                                         "is_blocked_by_draft": true,
@@ -20753,6 +24520,7 @@
                                         "employee_summary": {
                                             "gross": null,
                                             "deductions": null,
+                                            "subtractions": null,
                                             "reimbursements": null,
                                             "net": null
                                         },
@@ -20774,25 +24542,25 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "pay_schedule": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_schedule",
                                             "links": {
-                                                "self": "/pay_schedules/<ulid>"
+                                                "self": "/pay_schedules/<id>"
                                             }
                                         },
                                         "type": "regular",
@@ -20802,6 +24570,7 @@
                                         "period_end": "2023-07-31",
                                         "pay_date": "2023-07-31",
                                         "debit_date": "2023-07-29",
+                                        "approval_due_at": "2023-07-28T20:30:00.000000Z",
                                         "regular_periods_count": 12,
                                         "is_impacted_by_weekend_or_holiday": false,
                                         "is_blocked_by_draft": true,
@@ -20809,6 +24578,7 @@
                                         "employee_summary": {
                                             "gross": null,
                                             "deductions": null,
+                                            "subtractions": null,
                                             "reimbursements": null,
                                             "net": null
                                         },
@@ -20830,25 +24600,25 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "pay_schedule": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_schedule",
                                             "links": {
-                                                "self": "/pay_schedules/<ulid>"
+                                                "self": "/pay_schedules/<id>"
                                             }
                                         },
                                         "type": "regular",
@@ -20857,7 +24627,8 @@
                                         "period_start": "2023-08-01",
                                         "period_end": "2023-08-31",
                                         "pay_date": "2023-08-31",
-                                        "debit_date": "2023-08-29",
+                                        "debit_date": "2023-08-31",
+                                        "approval_due_at": "2023-08-30T20:30:00.000000Z",
                                         "regular_periods_count": 12,
                                         "is_impacted_by_weekend_or_holiday": false,
                                         "is_blocked_by_draft": true,
@@ -20865,6 +24636,7 @@
                                         "employee_summary": {
                                             "gross": null,
                                             "deductions": null,
+                                            "subtractions": null,
                                             "reimbursements": null,
                                             "net": null
                                         },
@@ -20886,25 +24658,25 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "pay_schedule": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_schedule",
                                             "links": {
-                                                "self": "/pay_schedules/<ulid>"
+                                                "self": "/pay_schedules/<id>"
                                             }
                                         },
                                         "type": "regular",
@@ -20913,7 +24685,8 @@
                                         "period_start": "2023-09-01",
                                         "period_end": "2023-09-30",
                                         "pay_date": "2023-09-29",
-                                        "debit_date": "2023-09-27",
+                                        "debit_date": "2023-09-29",
+                                        "approval_due_at": "2023-09-28T20:30:00.000000Z",
                                         "regular_periods_count": 12,
                                         "is_impacted_by_weekend_or_holiday": true,
                                         "is_blocked_by_draft": true,
@@ -20921,6 +24694,7 @@
                                         "employee_summary": {
                                             "gross": null,
                                             "deductions": null,
+                                            "subtractions": null,
                                             "reimbursements": null,
                                             "net": null
                                         },
@@ -20942,25 +24716,25 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "pay_schedule": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_schedule",
                                             "links": {
-                                                "self": "/pay_schedules/<ulid>"
+                                                "self": "/pay_schedules/<id>"
                                             }
                                         },
                                         "type": "regular",
@@ -20969,7 +24743,8 @@
                                         "period_start": "2023-10-01",
                                         "period_end": "2023-10-31",
                                         "pay_date": "2023-10-31",
-                                        "debit_date": "2023-10-29",
+                                        "debit_date": "2023-10-31",
+                                        "approval_due_at": "2023-10-30T20:30:00.000000Z",
                                         "regular_periods_count": 12,
                                         "is_impacted_by_weekend_or_holiday": false,
                                         "is_blocked_by_draft": true,
@@ -20977,6 +24752,7 @@
                                         "employee_summary": {
                                             "gross": null,
                                             "deductions": null,
+                                            "subtractions": null,
                                             "reimbursements": null,
                                             "net": null
                                         },
@@ -20998,25 +24774,25 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "pay_schedule": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_schedule",
                                             "links": {
-                                                "self": "/pay_schedules/<ulid>"
+                                                "self": "/pay_schedules/<id>"
                                             }
                                         },
                                         "type": "regular",
@@ -21025,7 +24801,8 @@
                                         "period_start": "2023-11-01",
                                         "period_end": "2023-11-30",
                                         "pay_date": "2023-11-30",
-                                        "debit_date": "2023-11-28",
+                                        "debit_date": "2023-11-30",
+                                        "approval_due_at": "2023-11-29T21:30:00.000000Z",
                                         "regular_periods_count": 12,
                                         "is_impacted_by_weekend_or_holiday": false,
                                         "is_blocked_by_draft": true,
@@ -21033,6 +24810,7 @@
                                         "employee_summary": {
                                             "gross": null,
                                             "deductions": null,
+                                            "subtractions": null,
                                             "reimbursements": null,
                                             "net": null
                                         },
@@ -21054,25 +24832,25 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "pay_schedule": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_schedule",
                                             "links": {
-                                                "self": "/pay_schedules/<ulid>"
+                                                "self": "/pay_schedules/<id>"
                                             }
                                         },
                                         "type": "regular",
@@ -21081,7 +24859,8 @@
                                         "period_start": "2023-12-01",
                                         "period_end": "2023-12-31",
                                         "pay_date": "2023-12-29",
-                                        "debit_date": "2023-12-27",
+                                        "debit_date": "2023-12-29",
+                                        "approval_due_at": "2023-12-28T21:30:00.000000Z",
                                         "regular_periods_count": 12,
                                         "is_impacted_by_weekend_or_holiday": true,
                                         "is_blocked_by_draft": true,
@@ -21089,6 +24868,7 @@
                                         "employee_summary": {
                                             "gross": null,
                                             "deductions": null,
+                                            "subtractions": null,
                                             "reimbursements": null,
                                             "net": null
                                         },
@@ -21110,25 +24890,25 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "pay_schedule": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_schedule",
                                             "links": {
-                                                "self": "/pay_schedules/<ulid>"
+                                                "self": "/pay_schedules/<id>"
                                             }
                                         },
                                         "type": "regular",
@@ -21137,7 +24917,8 @@
                                         "period_start": "2024-01-01",
                                         "period_end": "2024-01-31",
                                         "pay_date": "2024-01-31",
-                                        "debit_date": "2024-01-29",
+                                        "debit_date": "2024-01-31",
+                                        "approval_due_at": "2024-01-30T21:30:00.000000Z",
                                         "regular_periods_count": 12,
                                         "is_impacted_by_weekend_or_holiday": false,
                                         "is_blocked_by_draft": true,
@@ -21145,6 +24926,7 @@
                                         "employee_summary": {
                                             "gross": null,
                                             "deductions": null,
+                                            "subtractions": null,
                                             "reimbursements": null,
                                             "net": null
                                         },
@@ -21166,13 +24948,13 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/payrolls?business_entity_id=<ulid>&page=1",
-                                "last": "/payrolls?business_entity_id=<ulid>&page=1",
+                                "first": "/payrolls?business_entity_id=<id>&page=1",
+                                "last": "/payrolls?business_entity_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -21277,21 +25059,21 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "payroll",
                             "data": {
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "pay_schedule": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_schedule",
                                     "links": {
-                                        "self": "/pay_schedules/<ulid>"
+                                        "self": "/pay_schedules/<id>"
                                     }
                                 },
                                 "type": "regular",
@@ -21300,7 +25082,8 @@
                                 "period_start": "2023-01-01",
                                 "period_end": "2023-01-31",
                                 "pay_date": "2023-01-31",
-                                "debit_date": "2023-01-29",
+                                "debit_date": "2023-01-31",
+                                "approval_due_at": "2023-01-30T21:30:00.000000Z",
                                 "regular_periods_count": 12,
                                 "is_impacted_by_weekend_or_holiday": false,
                                 "is_blocked_by_draft": false,
@@ -21308,6 +25091,7 @@
                                 "employee_summary": {
                                     "gross": null,
                                     "deductions": null,
+                                    "subtractions": null,
                                     "reimbursements": null,
                                     "net": null
                                 },
@@ -21329,7 +25113,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/payrolls/<ulid>"
+                                "self": "/payrolls/<id>"
                             }
                         }
                     }
@@ -21359,21 +25143,21 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "payroll",
                             "data": {
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "pay_schedule": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_schedule",
                                     "links": {
-                                        "self": "/pay_schedules/<ulid>"
+                                        "self": "/pay_schedules/<id>"
                                     }
                                 },
                                 "type": "off_cycle",
@@ -21382,7 +25166,8 @@
                                 "period_start": "2023-01-01",
                                 "period_end": "2023-01-31",
                                 "pay_date": "2023-01-06",
-                                "debit_date": "2023-01-04",
+                                "debit_date": "2023-01-06",
+                                "approval_due_at": "2023-01-05T21:30:00.000000Z",
                                 "regular_periods_count": 12,
                                 "is_impacted_by_weekend_or_holiday": null,
                                 "is_blocked_by_draft": false,
@@ -21390,6 +25175,7 @@
                                 "employee_summary": {
                                     "gross": null,
                                     "deductions": null,
+                                    "subtractions": null,
                                     "reimbursements": null,
                                     "net": null
                                 },
@@ -21411,7 +25197,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/payrolls/<ulid>"
+                                "self": "/payrolls/<id>"
                             }
                         }
                     }
@@ -21441,21 +25227,21 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "payroll",
                             "data": {
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "pay_schedule": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_schedule",
                                     "links": {
-                                        "self": "/pay_schedules/<ulid>"
+                                        "self": "/pay_schedules/<id>"
                                     }
                                 },
                                 "type": "regular",
@@ -21464,7 +25250,8 @@
                                 "period_start": "2023-01-07",
                                 "period_end": "2023-01-07",
                                 "pay_date": "2023-01-07",
-                                "debit_date": "2023-01-05",
+                                "debit_date": "2023-01-06",
+                                "approval_due_at": "2023-01-05T21:30:00.000000Z",
                                 "regular_periods_count": null,
                                 "is_impacted_by_weekend_or_holiday": false,
                                 "is_blocked_by_draft": false,
@@ -21472,6 +25259,7 @@
                                 "employee_summary": {
                                     "gross": null,
                                     "deductions": null,
+                                    "subtractions": null,
                                     "reimbursements": null,
                                     "net": null
                                 },
@@ -21493,7 +25281,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/payrolls/<ulid>"
+                                "self": "/payrolls/<id>"
                             }
                         }
                     }
@@ -21523,21 +25311,21 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "payroll",
                             "data": {
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "pay_schedule": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_schedule",
                                     "links": {
-                                        "self": "/pay_schedules/<ulid>"
+                                        "self": "/pay_schedules/<id>"
                                     }
                                 },
                                 "type": "historical",
@@ -21546,7 +25334,8 @@
                                 "period_start": "2023-01-07",
                                 "period_end": "2023-01-07",
                                 "pay_date": "2023-01-07",
-                                "debit_date": "2023-01-05",
+                                "debit_date": "2023-01-06",
+                                "approval_due_at": "2023-01-05T21:30:00.000000Z",
                                 "regular_periods_count": null,
                                 "is_impacted_by_weekend_or_holiday": false,
                                 "is_blocked_by_draft": false,
@@ -21554,6 +25343,7 @@
                                 "employee_summary": {
                                     "gross": null,
                                     "deductions": null,
+                                    "subtractions": null,
                                     "reimbursements": null,
                                     "net": null
                                 },
@@ -21575,7 +25365,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/payrolls/<ulid>"
+                                "self": "/payrolls/<id>"
                             }
                         }
                     }
@@ -21679,14 +25469,14 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "record_of_employment",
                                     "data": {
                                         "work_assignment": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "work_assignment",
                                             "links": {
-                                                "self": "/work_assignments/<ulid>"
+                                                "self": "/work_assignments/<id>"
                                             }
                                         },
                                         "serial_number": null,
@@ -21694,8 +25484,8 @@
                                         "employer_payroll_reference_number": null,
                                         "cra_payroll_account_number": "000100293",
                                         "pay_period_type": "S",
-                                        "sin": "123123123",
-                                        "employee_first_name": "Jogn",
+                                        "sin": "405399940",
+                                        "employee_first_name": "John",
                                         "employee_initial": null,
                                         "employee_last_name": "Smith",
                                         "employee_address": "123 Fake Street",
@@ -21762,13 +25552,13 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/record_of_employments/<ulid>"
+                                        "self": "/record_of_employments/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/record_of_employments?work_assignment_id=<ulid>&page=1",
-                                "last": "/record_of_employments?work_assignment_id=<ulid>&page=1",
+                                "first": "/record_of_employments?work_assignment_id=<id>&page=1",
+                                "last": "/record_of_employments?work_assignment_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -21849,14 +25639,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "record_of_employment",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
                                 "serial_number": null,
@@ -21864,8 +25654,8 @@
                                 "employer_payroll_reference_number": null,
                                 "cra_payroll_account_number": "000100293",
                                 "pay_period_type": "S",
-                                "sin": "123123123",
-                                "employee_first_name": "Jogn",
+                                "sin": "405399940",
+                                "employee_first_name": "John",
                                 "employee_initial": null,
                                 "employee_last_name": "Smith",
                                 "employee_address": "123 Fake Street",
@@ -21932,7 +25722,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/record_of_employments/<ulid>"
+                                "self": "/record_of_employments/<id>"
                             }
                         }
                     }
@@ -21962,14 +25752,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "record_of_employment",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
                                 "serial_number": null,
@@ -22045,7 +25835,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/record_of_employments/<ulid>"
+                                "self": "/record_of_employments/<id>"
                             }
                         }
                     }
@@ -22075,14 +25865,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "record_of_employment",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
                                 "serial_number": null,
@@ -22090,8 +25880,8 @@
                                 "employer_payroll_reference_number": null,
                                 "cra_payroll_account_number": "000100293",
                                 "pay_period_type": "S",
-                                "sin": "123123123",
-                                "employee_first_name": "Jogn",
+                                "sin": "405399940",
+                                "employee_first_name": "John",
                                 "employee_initial": null,
                                 "employee_last_name": "Smith",
                                 "employee_address": "123 Fake Street",
@@ -22158,7 +25948,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/record_of_employments/<ulid>"
+                                "self": "/record_of_employments/<id>"
                             }
                         }
                     }
@@ -22214,7 +26004,7 @@
                                             {
                                                 "type": "object",
                                                 "properties": {
-                                                    "reimbursement_template": {
+                                                    "business_entity_reimbursement": {
                                                         "type": "object",
                                                         "nullable": true,
                                                         "properties": {
@@ -22226,7 +26016,7 @@
                                                                 "type": "string"
                                                             },
                                                             "data": {
-                                                                "$ref": "#/components/schemas/ReimbursementTemplate"
+                                                                "$ref": "#/components/schemas/BusinessEntityReimbursement"
                                                             }
                                                         }
                                                     }
@@ -22262,18 +26052,18 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "reimbursement",
                                     "data": {
                                         "work_assignment": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "work_assignment",
                                             "links": {
-                                                "self": "/work_assignments/<ulid>"
+                                                "self": "/work_assignments/<id>"
                                             }
                                         },
                                         "reimbursement_type": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "reimbursement_type",
                                             "data": {
                                                 "type": "non_taxable_reimbursement",
@@ -22292,18 +26082,18 @@
                                         "amount": 35,
                                         "effective_from": "2023-01-01",
                                         "effective_to": null,
-                                        "reimbursement_template": null,
+                                        "business_entity_reimbursement": null,
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/reimbursements/<ulid>"
+                                        "self": "/reimbursements/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/reimbursements?work_assignment_id=<ulid>&page=1",
-                                "last": "/reimbursements?work_assignment_id=<ulid>&page=1",
+                                "first": "/reimbursements?work_assignment_id=<id>&page=1",
+                                "last": "/reimbursements?work_assignment_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -22340,7 +26130,7 @@
                                         {
                                             "type": "object",
                                             "properties": {
-                                                "reimbursement_template": {
+                                                "business_entity_reimbursement": {
                                                     "type": "object",
                                                     "nullable": true,
                                                     "properties": {
@@ -22352,7 +26142,7 @@
                                                             "type": "string"
                                                         },
                                                         "data": {
-                                                            "$ref": "#/components/schemas/ReimbursementTemplate"
+                                                            "$ref": "#/components/schemas/BusinessEntityReimbursement"
                                                         }
                                                     }
                                                 }
@@ -22384,18 +26174,18 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "reimbursement",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
                                 "reimbursement_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "reimbursement_type",
                                     "data": {
                                         "type": "non_taxable_reimbursement",
@@ -22414,12 +26204,12 @@
                                 "amount": 35,
                                 "effective_from": "2023-01-01",
                                 "effective_to": null,
-                                "reimbursement_template": null,
+                                "business_entity_reimbursement": null,
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/reimbursements/<ulid>"
+                                "self": "/reimbursements/<id>"
                             }
                         }
                     }
@@ -22449,18 +26239,18 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "reimbursement",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
                                 "reimbursement_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "reimbursement_type",
                                     "data": {
                                         "type": "non_taxable_reimbursement",
@@ -22479,12 +26269,12 @@
                                 "amount": 35,
                                 "effective_from": "2023-01-01",
                                 "effective_to": null,
-                                "reimbursement_template": null,
+                                "business_entity_reimbursement": null,
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/reimbursements/<ulid>"
+                                "self": "/reimbursements/<id>"
                             }
                         }
                     }
@@ -22514,18 +26304,18 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "reimbursement",
                             "data": {
                                 "work_assignment": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 },
                                 "reimbursement_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "reimbursement_type",
                                     "data": {
                                         "type": "non_taxable_reimbursement",
@@ -22544,12 +26334,12 @@
                                 "amount": 35,
                                 "effective_from": "2023-01-01",
                                 "effective_to": null,
-                                "reimbursement_template": null,
+                                "business_entity_reimbursement": null,
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/reimbursements/<ulid>"
+                                "self": "/reimbursements/<id>"
                             }
                         }
                     }
@@ -22653,14 +26443,14 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "reimbursement_line_item",
                                     "data": {
                                         "pay_stub": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_stub",
                                             "links": {
-                                                "self": "/pay_stubs/<ulid>"
+                                                "self": "/pay_stubs/<id>"
                                             }
                                         },
                                         "line_item_type": "reimbursement",
@@ -22668,7 +26458,7 @@
                                         "amount": 35,
                                         "amount_override": null,
                                         "reimbursement_type": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "reimbursement_type",
                                             "data": {
                                                 "type": "non_taxable_reimbursement",
@@ -22690,13 +26480,13 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/reimbursement_line_items/<ulid>"
+                                        "self": "/reimbursement_line_items/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/reimbursement_line_items?pay_stub_id=<ulid>&page=1",
-                                "last": "/reimbursement_line_items?pay_stub_id=<ulid>&page=1",
+                                "first": "/reimbursement_line_items?pay_stub_id=<id>&page=1",
+                                "last": "/reimbursement_line_items?pay_stub_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -22777,14 +26567,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "reimbursement_line_item",
                             "data": {
                                 "pay_stub": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_stub",
                                     "links": {
-                                        "self": "/pay_stubs/<ulid>"
+                                        "self": "/pay_stubs/<id>"
                                     }
                                 },
                                 "line_item_type": "reimbursement",
@@ -22792,7 +26582,7 @@
                                 "amount": 35,
                                 "amount_override": null,
                                 "reimbursement_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "reimbursement_type",
                                     "data": {
                                         "type": "non_taxable_reimbursement",
@@ -22814,7 +26604,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/reimbursement_line_items/<ulid>"
+                                "self": "/reimbursement_line_items/<id>"
                             }
                         }
                     }
@@ -22844,14 +26634,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "reimbursement_line_item",
                             "data": {
                                 "pay_stub": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_stub",
                                     "links": {
-                                        "self": "/pay_stubs/<ulid>"
+                                        "self": "/pay_stubs/<id>"
                                     }
                                 },
                                 "line_item_type": "reimbursement",
@@ -22859,7 +26649,7 @@
                                 "amount": 35,
                                 "amount_override": null,
                                 "reimbursement_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "reimbursement_type",
                                     "data": {
                                         "type": "non_taxable_reimbursement",
@@ -22881,7 +26671,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/reimbursement_line_items/<ulid>"
+                                "self": "/reimbursement_line_items/<id>"
                             }
                         }
                     }
@@ -22911,14 +26701,14 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "reimbursement_line_item",
                             "data": {
                                 "pay_stub": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_stub",
                                     "links": {
-                                        "self": "/pay_stubs/<ulid>"
+                                        "self": "/pay_stubs/<id>"
                                     }
                                 },
                                 "line_item_type": "reimbursement",
@@ -22926,7 +26716,7 @@
                                 "amount": 35,
                                 "amount_override": null,
                                 "reimbursement_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "reimbursement_type",
                                     "data": {
                                         "type": "non_taxable_reimbursement",
@@ -22948,386 +26738,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/reimbursement_line_items/<ulid>"
-                            }
-                        }
-                    }
-                }
-            },
-            "ReimbursementTemplateDestroy": {
-                "description": "No Content",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "format": "ulid"
-                                },
-                                "object": {
-                                    "type": "string"
-                                },
-                                "data": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ReimbursementTemplate"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "ReimbursementTemplateIndex": {
-                "description": "OK",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "format": "ulid"
-                                },
-                                "object": {
-                                    "type": "string"
-                                },
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "allOf": [
-                                            {
-                                                "$ref": "#/components/schemas/ReimbursementTemplate"
-                                            },
-                                            {
-                                                "type": "object",
-                                                "properties": {
-                                                    "business_entity": {
-                                                        "type": "object",
-                                                        "nullable": true,
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "string",
-                                                                "format": "ulid"
-                                                            },
-                                                            "object": {
-                                                                "type": "string"
-                                                            },
-                                                            "data": {
-                                                                "$ref": "#/components/schemas/BusinessEntity"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "type": "object",
-                                                "properties": {
-                                                    "gl_code": {
-                                                        "type": "object",
-                                                        "nullable": true,
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "string",
-                                                                "format": "ulid"
-                                                            },
-                                                            "object": {
-                                                                "type": "string"
-                                                            },
-                                                            "data": {
-                                                                "$ref": "#/components/schemas/GlCode"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        ]
-                                    }
-                                }
-                            }
-                        },
-                        "example": {
-                            "object": "list",
-                            "data": [
-                                {
-                                    "id": "<ulid>",
-                                    "object": "reimbursement_template",
-                                    "data": {
-                                        "business_entity": {
-                                            "id": "<ulid>",
-                                            "object": "business_entity",
-                                            "links": {
-                                                "self": "/business_entities/<ulid>"
-                                            }
-                                        },
-                                        "title": null,
-                                        "reimbursement_type": {
-                                            "id": "<ulid>",
-                                            "object": "reimbursement_type",
-                                            "data": {
-                                                "type": "non_taxable_reimbursement",
-                                                "label": "Non-Taxable Reimbursement",
-                                                "is_taxable": false,
-                                                "is_insurable": false,
-                                                "is_pensionable": false,
-                                                "t4_code": null,
-                                                "created_at": "2023-01-01T00:00:00.000000Z",
-                                                "updated_at": "2023-01-01T00:00:00.000000Z"
-                                            },
-                                            "links": {
-                                                "self": null
-                                            }
-                                        },
-                                        "created_at": "2023-01-01T00:00:00.000000Z",
-                                        "updated_at": "2023-01-01T00:00:00.000000Z"
-                                    },
-                                    "links": {
-                                        "self": "/reimbursement_templates/<ulid>"
-                                    }
-                                }
-                            ],
-                            "links": {
-                                "first": "/reimbursement_templates?business_entity_id=<ulid>&page=1",
-                                "last": "/reimbursement_templates?business_entity_id=<ulid>&page=1",
-                                "prev": null,
-                                "next": null
-                            },
-                            "meta": {
-                                "current_page": 1,
-                                "last_page": 1,
-                                "per_page": 15,
-                                "total": 1,
-                                "has_more": false
-                            }
-                        }
-                    }
-                }
-            },
-            "ReimbursementTemplateShow": {
-                "description": "OK",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "format": "ulid"
-                                },
-                                "object": {
-                                    "type": "string"
-                                },
-                                "data": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ReimbursementTemplate"
-                                        },
-                                        {
-                                            "type": "object",
-                                            "properties": {
-                                                "business_entity": {
-                                                    "type": "object",
-                                                    "nullable": true,
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string",
-                                                            "format": "ulid"
-                                                        },
-                                                        "object": {
-                                                            "type": "string"
-                                                        },
-                                                        "data": {
-                                                            "$ref": "#/components/schemas/BusinessEntity"
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "type": "object",
-                                            "properties": {
-                                                "gl_code": {
-                                                    "type": "object",
-                                                    "nullable": true,
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string",
-                                                            "format": "ulid"
-                                                        },
-                                                        "object": {
-                                                            "type": "string"
-                                                        },
-                                                        "data": {
-                                                            "$ref": "#/components/schemas/GlCode"
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        },
-                        "example": {
-                            "id": "<ulid>",
-                            "object": "reimbursement_template",
-                            "data": {
-                                "business_entity": {
-                                    "id": "<ulid>",
-                                    "object": "business_entity",
-                                    "links": {
-                                        "self": "/business_entities/<ulid>"
-                                    }
-                                },
-                                "title": null,
-                                "reimbursement_type": {
-                                    "id": "<ulid>",
-                                    "object": "reimbursement_type",
-                                    "data": {
-                                        "type": "non_taxable_reimbursement",
-                                        "label": "Non-Taxable Reimbursement",
-                                        "is_taxable": false,
-                                        "is_insurable": false,
-                                        "is_pensionable": false,
-                                        "t4_code": null,
-                                        "created_at": "2023-01-01T00:00:00.000000Z",
-                                        "updated_at": "2023-01-01T00:00:00.000000Z"
-                                    },
-                                    "links": {
-                                        "self": null
-                                    }
-                                },
-                                "created_at": "2023-01-01T00:00:00.000000Z",
-                                "updated_at": "2023-01-01T00:00:00.000000Z"
-                            },
-                            "links": {
-                                "self": "/reimbursement_templates/<ulid>"
-                            }
-                        }
-                    }
-                }
-            },
-            "ReimbursementTemplateStore": {
-                "description": "Created",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "format": "ulid"
-                                },
-                                "object": {
-                                    "type": "string"
-                                },
-                                "data": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ReimbursementTemplate"
-                                        }
-                                    ]
-                                }
-                            }
-                        },
-                        "example": {
-                            "id": "<ulid>",
-                            "object": "reimbursement_template",
-                            "data": {
-                                "business_entity": {
-                                    "id": "<ulid>",
-                                    "object": "business_entity",
-                                    "links": {
-                                        "self": "/business_entities/<ulid>"
-                                    }
-                                },
-                                "title": null,
-                                "reimbursement_type": {
-                                    "id": "<ulid>",
-                                    "object": "reimbursement_type",
-                                    "data": {
-                                        "type": "non_taxable_reimbursement",
-                                        "label": "Non-Taxable Reimbursement",
-                                        "is_taxable": false,
-                                        "is_insurable": false,
-                                        "is_pensionable": false,
-                                        "t4_code": null,
-                                        "created_at": "2023-01-01T00:00:00.000000Z",
-                                        "updated_at": "2023-01-01T00:00:00.000000Z"
-                                    },
-                                    "links": {
-                                        "self": null
-                                    }
-                                },
-                                "created_at": "2023-01-01T00:00:00.000000Z",
-                                "updated_at": "2023-01-01T00:00:00.000000Z"
-                            },
-                            "links": {
-                                "self": "/reimbursement_templates/<ulid>"
-                            }
-                        }
-                    }
-                }
-            },
-            "ReimbursementTemplateUpdate": {
-                "description": "OK",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "format": "ulid"
-                                },
-                                "object": {
-                                    "type": "string"
-                                },
-                                "data": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ReimbursementTemplate"
-                                        }
-                                    ]
-                                }
-                            }
-                        },
-                        "example": {
-                            "id": "<ulid>",
-                            "object": "reimbursement_template",
-                            "data": {
-                                "business_entity": {
-                                    "id": "<ulid>",
-                                    "object": "business_entity",
-                                    "links": {
-                                        "self": "/business_entities/<ulid>"
-                                    }
-                                },
-                                "title": null,
-                                "reimbursement_type": {
-                                    "id": "<ulid>",
-                                    "object": "reimbursement_type",
-                                    "data": {
-                                        "type": "non_taxable_reimbursement",
-                                        "label": "Non-Taxable Reimbursement",
-                                        "is_taxable": false,
-                                        "is_insurable": false,
-                                        "is_pensionable": false,
-                                        "t4_code": null,
-                                        "created_at": "2023-01-01T00:00:00.000000Z",
-                                        "updated_at": "2023-01-01T00:00:00.000000Z"
-                                    },
-                                    "links": {
-                                        "self": null
-                                    }
-                                },
-                                "created_at": "2023-01-01T00:00:00.000000Z",
-                                "updated_at": "2023-01-01T00:00:00.000000Z"
-                            },
-                            "links": {
-                                "self": "/reimbursement_templates/<ulid>"
+                                "self": "/reimbursement_line_items/<id>"
                             }
                         }
                     }
@@ -23363,7 +26774,7 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "reimbursement_type",
                                     "data": {
                                         "type": "non_taxable_reimbursement",
@@ -23380,7 +26791,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "reimbursement_type",
                                     "data": {
                                         "type": "taxable_reimbursement",
@@ -23491,29 +26902,32 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "remittance_account",
                                     "data": {
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "type": "benefit_provider",
+                                        "categories": [
+                                            "benefit"
+                                        ],
                                         "label": "Sunlife",
                                         "created_at": "2023-01-01T00:00:00.000000Z",
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/remittance_accounts/<ulid>"
+                                        "self": "/remittance_accounts/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/remittance_accounts?business_entity_id=<ulid>&page=1",
-                                "last": "/remittance_accounts?business_entity_id=<ulid>&page=1",
+                                "first": "/remittance_accounts?business_entity_id=<id>&page=1",
+                                "last": "/remittance_accounts?business_entity_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -23573,23 +26987,26 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "remittance_account",
                             "data": {
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "type": "benefit_provider",
+                                "categories": [
+                                    "benefit"
+                                ],
                                 "label": "Sunlife",
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/remittance_accounts/<ulid>"
+                                "self": "/remittance_accounts/<id>"
                             }
                         }
                     }
@@ -23619,23 +27036,26 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "remittance_account",
                             "data": {
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "type": "benefit_provider",
+                                "categories": [
+                                    "benefit"
+                                ],
                                 "label": "Sunlife",
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/remittance_accounts/<ulid>"
+                                "self": "/remittance_accounts/<id>"
                             }
                         }
                     }
@@ -23665,23 +27085,26 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "remittance_account",
                             "data": {
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "type": "benefit_provider",
+                                "categories": [
+                                    "benefit"
+                                ],
                                 "label": "Sunlife",
                                 "created_at": "2023-01-01T00:00:00.000000Z",
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/remittance_accounts/<ulid>"
+                                "self": "/remittance_accounts/<id>"
                             }
                         }
                     }
@@ -23737,17 +27160,17 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "report",
                             "data": {
                                 "type": "liability",
                                 "business_entity": null,
                                 "pay_schedule": null,
                                 "payroll": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "payroll",
                                     "links": {
-                                        "self": "/payrolls/<ulid>"
+                                        "self": "/payrolls/<id>"
                                     }
                                 },
                                 "filters": {
@@ -23761,7 +27184,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/reports/<ulid>"
+                                "self": "/reports/<id>"
                             }
                         }
                     }
@@ -23818,21 +27241,23 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "statutory_withholding_line_item",
                                     "data": {
                                         "pay_stub": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_stub",
                                             "links": {
-                                                "self": "/pay_stubs/<ulid>"
+                                                "self": "/pay_stubs/<id>"
                                             }
                                         },
                                         "line_item_type": "statutory_withholding",
+                                        "is_system": true,
                                         "is_managed": true,
                                         "amount": 500,
+                                        "amount_override": null,
                                         "statutory_withholding_type": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "statutory_withholding_type",
                                             "data": {
                                                 "type": "federal_income_tax",
@@ -23850,13 +27275,13 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/statutory_withholding_line_items/<ulid>"
+                                        "self": "/statutory_withholding_line_items/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/statutory_withholding_line_items?pay_stub_id=<ulid>&page=1",
-                                "last": "/statutory_withholding_line_items?pay_stub_id=<ulid>&page=1",
+                                "first": "/statutory_withholding_line_items?pay_stub_id=<id>&page=1",
+                                "last": "/statutory_withholding_line_items?pay_stub_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -23916,21 +27341,23 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "statutory_withholding_line_item",
                             "data": {
                                 "pay_stub": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_stub",
                                     "links": {
-                                        "self": "/pay_stubs/<ulid>"
+                                        "self": "/pay_stubs/<id>"
                                     }
                                 },
                                 "line_item_type": "statutory_withholding",
+                                "is_system": true,
                                 "is_managed": true,
                                 "amount": 500,
+                                "amount_override": null,
                                 "statutory_withholding_type": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "statutory_withholding_type",
                                     "data": {
                                         "type": "federal_income_tax",
@@ -23948,7 +27375,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/statutory_withholding_line_items/<ulid>"
+                                "self": "/statutory_withholding_line_items/<id>"
                             }
                         }
                     }
@@ -23984,7 +27411,7 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "statutory_withholding_type",
                                     "data": {
                                         "type": "cpp",
@@ -23997,7 +27424,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "statutory_withholding_type",
                                     "data": {
                                         "type": "qpp",
@@ -24010,7 +27437,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "statutory_withholding_type",
                                     "data": {
                                         "type": "ei",
@@ -24023,7 +27450,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "statutory_withholding_type",
                                     "data": {
                                         "type": "federal_income_tax",
@@ -24036,7 +27463,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "statutory_withholding_type",
                                     "data": {
                                         "type": "provincial_income_tax",
@@ -24049,7 +27476,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "statutory_withholding_type",
                                     "data": {
                                         "type": "territorial_income_tax",
@@ -24062,7 +27489,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "statutory_withholding_type",
                                     "data": {
                                         "type": "employer_health_tax",
@@ -24075,7 +27502,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "statutory_withholding_type",
                                     "data": {
                                         "type": "qpip",
@@ -24088,7 +27515,7 @@
                                     }
                                 },
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "statutory_withholding_type",
                                     "data": {
                                         "type": "cpp_2",
@@ -24205,7 +27632,7 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "webhook",
                                     "data": {
                                         "url": "http://localhost/webhooks",
@@ -24214,7 +27641,7 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/webhooks/<ulid>"
+                                        "self": "/webhooks/<id>"
                                     }
                                 }
                             ],
@@ -24259,7 +27686,7 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "webhook",
                             "data": {
                                 "url": "http://localhost/webhooks",
@@ -24268,7 +27695,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/webhooks/<ulid>"
+                                "self": "/webhooks/<id>"
                             }
                         }
                     }
@@ -24298,7 +27725,7 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "webhook",
                             "data": {
                                 "url": "http://localhost/webhooks",
@@ -24307,7 +27734,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/webhooks/<ulid>"
+                                "self": "/webhooks/<id>"
                             }
                         }
                     }
@@ -24337,7 +27764,7 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "webhook",
                             "data": {
                                 "url": "http://localhost/webhooks",
@@ -24346,7 +27773,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/webhooks/<ulid>"
+                                "self": "/webhooks/<id>"
                             }
                         }
                     }
@@ -24516,32 +27943,34 @@
                             "object": "list",
                             "data": [
                                 {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "work_assignment",
                                     "data": {
                                         "title": null,
                                         "employee": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "employee",
                                             "links": {
-                                                "self": "/employees/<ulid>"
+                                                "self": "/employees/<id>"
                                             }
                                         },
                                         "pay_schedule": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "pay_schedule",
                                             "links": {
-                                                "self": "/pay_schedules/<ulid>"
+                                                "self": "/pay_schedules/<id>"
                                             }
                                         },
                                         "business_entity": {
-                                            "id": "<ulid>",
+                                            "id": "<id>",
                                             "object": "business_entity",
                                             "links": {
-                                                "self": "/business_entities/<ulid>"
+                                                "self": "/business_entities/<id>"
                                             }
                                         },
                                         "tax_jurisdiction": null,
+                                        "is_cpp_exempt": false,
+                                        "is_ei_exempt": false,
                                         "accrued_vacation_pay": 0,
                                         "paid_vacation_pay": 0,
                                         "archived_at": null,
@@ -24549,13 +27978,13 @@
                                         "updated_at": "2023-01-01T00:00:00.000000Z"
                                     },
                                     "links": {
-                                        "self": "/work_assignments/<ulid>"
+                                        "self": "/work_assignments/<id>"
                                     }
                                 }
                             ],
                             "links": {
-                                "first": "/work_assignments?employee_id=<ulid>&page=1",
-                                "last": "/work_assignments?employee_id=<ulid>&page=1",
+                                "first": "/work_assignments?employee_id=<id>&page=1",
+                                "last": "/work_assignments?employee_id=<id>&page=1",
                                 "prev": null,
                                 "next": null
                             },
@@ -24702,32 +28131,34 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "work_assignment",
                             "data": {
                                 "title": null,
                                 "employee": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "employee",
                                     "links": {
-                                        "self": "/employees/<ulid>"
+                                        "self": "/employees/<id>"
                                     }
                                 },
                                 "pay_schedule": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_schedule",
                                     "links": {
-                                        "self": "/pay_schedules/<ulid>"
+                                        "self": "/pay_schedules/<id>"
                                     }
                                 },
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "tax_jurisdiction": null,
+                                "is_cpp_exempt": false,
+                                "is_ei_exempt": false,
                                 "accrued_vacation_pay": 0,
                                 "paid_vacation_pay": 0,
                                 "archived_at": null,
@@ -24735,7 +28166,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/work_assignments/<ulid>"
+                                "self": "/work_assignments/<id>"
                             }
                         }
                     }
@@ -24765,32 +28196,34 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "work_assignment",
                             "data": {
                                 "title": null,
                                 "employee": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "employee",
                                     "links": {
-                                        "self": "/employees/<ulid>"
+                                        "self": "/employees/<id>"
                                     }
                                 },
                                 "pay_schedule": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_schedule",
                                     "links": {
-                                        "self": "/pay_schedules/<ulid>"
+                                        "self": "/pay_schedules/<id>"
                                     }
                                 },
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "tax_jurisdiction": null,
+                                "is_cpp_exempt": false,
+                                "is_ei_exempt": false,
                                 "accrued_vacation_pay": 0,
                                 "paid_vacation_pay": 0,
                                 "archived_at": null,
@@ -24798,7 +28231,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/work_assignments/<ulid>"
+                                "self": "/work_assignments/<id>"
                             }
                         }
                     }
@@ -24828,32 +28261,34 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "work_assignment",
                             "data": {
                                 "title": null,
                                 "employee": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "employee",
                                     "links": {
-                                        "self": "/employees/<ulid>"
+                                        "self": "/employees/<id>"
                                     }
                                 },
                                 "pay_schedule": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_schedule",
                                     "links": {
-                                        "self": "/pay_schedules/<ulid>"
+                                        "self": "/pay_schedules/<id>"
                                     }
                                 },
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "tax_jurisdiction": null,
+                                "is_cpp_exempt": false,
+                                "is_ei_exempt": false,
                                 "accrued_vacation_pay": 0,
                                 "paid_vacation_pay": 0,
                                 "archived_at": null,
@@ -24861,7 +28296,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/work_assignments/<ulid>"
+                                "self": "/work_assignments/<id>"
                             }
                         }
                     }
@@ -24891,32 +28326,34 @@
                             }
                         },
                         "example": {
-                            "id": "<ulid>",
+                            "id": "<id>",
                             "object": "work_assignment",
                             "data": {
                                 "title": "New title",
                                 "employee": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "employee",
                                     "links": {
-                                        "self": "/employees/<ulid>"
+                                        "self": "/employees/<id>"
                                     }
                                 },
                                 "pay_schedule": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "pay_schedule",
                                     "links": {
-                                        "self": "/pay_schedules/<ulid>"
+                                        "self": "/pay_schedules/<id>"
                                     }
                                 },
                                 "business_entity": {
-                                    "id": "<ulid>",
+                                    "id": "<id>",
                                     "object": "business_entity",
                                     "links": {
-                                        "self": "/business_entities/<ulid>"
+                                        "self": "/business_entities/<id>"
                                     }
                                 },
                                 "tax_jurisdiction": null,
+                                "is_cpp_exempt": false,
+                                "is_ei_exempt": false,
                                 "accrued_vacation_pay": 0,
                                 "paid_vacation_pay": 0,
                                 "archived_at": null,
@@ -24924,7 +28361,7 @@
                                 "updated_at": "2023-01-01T00:00:00.000000Z"
                             },
                             "links": {
-                                "self": "/work_assignments/<ulid>"
+                                "self": "/work_assignments/<id>"
                             }
                         }
                     }
